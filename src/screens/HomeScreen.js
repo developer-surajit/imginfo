@@ -57,14 +57,14 @@ export default class HomeScreen extends Component {
 
   componentDidMount = () => {
     this.requestGpsPermission();
-    this.focusListener = this.props.navigation.addListener(
-      'willFocus',
-      payload => {
-        this.setState({
-          profileImageURI: null,
-        });
-      },
-    );
+    // this.focusListener = this.props.navigation.addListener(
+    //   'willFocus',
+    //   payload => {
+    //     this.setState({
+    //       profileImageURI: null,
+    //     });
+    //   },
+    // );
   };
 
   requestGpsPermission = async () => {
@@ -294,7 +294,7 @@ export default class HomeScreen extends Component {
           </View>
         ) : null}
 
-        <Modal
+        {/* <Modal
           isVisible={this.state.modalVisible}
           onBackdropPress={() => this.setModalVisible(false)}
           deviceWidth={deviceWidth}
@@ -324,16 +324,16 @@ export default class HomeScreen extends Component {
               buttonStyle={{marginHorizontal: 25}}
             />
           </View>
-        </Modal>
+        </Modal> */}
 
         <View
           style={{
             flex: 1,
             // justifyContent: 'space-between',
             marginHorizontal: 15,
-            padding: 10,
+            // padding: 10,
             borderRadius: 5,
-            elevation: 1,
+            // elevation: 1,
             marginBottom: 15,
             marginTop: 15,
           }}>
@@ -354,7 +354,7 @@ export default class HomeScreen extends Component {
                   width: '100%',
                   height: 200,
                   // marginHorizontal: 15,
-                  resizeMode: 'contain',
+                  resizeMode: 'cover',
                   margin: 15,
                 }}
               />
@@ -384,7 +384,8 @@ export default class HomeScreen extends Component {
             }}
             containerStyle={{marginHorizontal: 20, marginTop: 25}}
             title="Take picture"
-            onPress={() => this.setState({modalVisible: true})}
+            onPress={() => this.requestCameraPermission('TAKE')}
+            // onPress={() => this.setState({modalVisible: true})}
             titleStyle={{color: 'white'}}
             // raised
           />

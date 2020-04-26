@@ -14,6 +14,7 @@ import {universalApiCall} from './../utils/universalApiCall';
 import AsyncStorage from '@react-native-community/async-storage';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Colors from '../constants/Colors';
+import {StackActions, NavigationActions} from 'react-navigation';
 class DetailsSubmitScreen extends Component {
   constructor(props) {
     super(props);
@@ -97,7 +98,15 @@ class DetailsSubmitScreen extends Component {
           loading: false,
         });
         ToastAndroid.show('Image uploaded successfully', 1500);
-        this.props.navigation.popToTop();
+        const resetAction = StackActions.reset({
+          index: 0,
+          actions: [
+            // NavigationActions.navigate({routeName: 'HomeScreen'}),
+            NavigationActions.navigate({routeName: 'DashboardScreen'}),
+          ],
+        });
+        this.props.navigation.dispatch(resetAction);
+        // this.props.navigation.push('HomeScreen');
       }
 
       console.log(data, 'submit data');
@@ -119,18 +128,26 @@ class DetailsSubmitScreen extends Component {
           textStyle={{color: 'white'}}
         />
         {this.state.imgUrl ? (
-          <Image
-            source={{uri: this.state.imgUrl}}
+          <View
             style={{
-              // width: '100%',
-              height: 250,
-              marginHorizontal: 15,
-              borderRadius: 4,
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
               overflow: 'hidden',
-              resizeMode: 'contain',
-              marginTop: 50,
-            }}
-          />
+              marginHorizontal: 15,
+            }}>
+            <Image
+              source={{uri: this.state.imgUrl}}
+              style={{
+                width: '100%',
+                height: 200,
+                borderRadius: 4,
+                overflow: 'hidden',
+                resizeMode: 'cover',
+                marginTop: 30,
+              }}
+            />
+          </View>
         ) : null}
         <Text
           style={{
