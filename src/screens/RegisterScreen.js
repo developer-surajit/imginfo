@@ -18,7 +18,6 @@ const deviceWidth = Dimensions.get('window').width;
 // import isEmpty from '../utils/isEmpty';
 import {universalApiCall} from './../utils/universalApiCall';
 import Spinner from 'react-native-loading-spinner-overlay';
-import Axios from 'axios';
 export default class RegisterScreen extends Component {
   constructor(props) {
     super(props);
@@ -78,16 +77,8 @@ export default class RegisterScreen extends Component {
       this.setState({
         loading: false,
       });
-      Axios.post(
-        'https://y0kh9cj9pc.execute-api.us-east-1.amazonaws.com/test',
-        {
-          error,
-          res: error.response,
-        },
-      ).then(resp => {
-        alert('Something went wrong, please try again');
-        console.log(error, error.response);
-      });
+      alert('Something went wrong, please try again');
+      console.log(error.response);
     }
   };
 
