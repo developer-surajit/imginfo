@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Dimensions,
   ToastAndroid,
+  Image,
 } from 'react-native';
 import {Button, Input} from 'react-native-elements';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -17,6 +18,9 @@ import {universalApiCall} from './../utils/universalApiCall';
 import Spinner from 'react-native-loading-spinner-overlay';
 let PhoneRegex = /^[6-9]\d{9}$/;
 const deviceWidth = Dimensions.get('window').width;
+const logo = require('./../assets/images/Logo.jpg');
+import Colors from '../constants/Colors';
+
 export default class LoginScreen extends Component {
   constructor(props) {
     super(props);
@@ -114,6 +118,18 @@ export default class LoginScreen extends Component {
               // console.log({values}, {errors}, {touched});
               return (
                 <View style={styles.loginFormView}>
+                  <View style={{marginBottom: 50}}>
+                    <Image
+                      source={logo}
+                      style={{
+                        width: '100%',
+                        height: 150,
+                        borderRadius: 4,
+                        overflow: 'hidden',
+                        resizeMode: 'contain',
+                      }}
+                    />
+                  </View>
                   <Input
                     placeholder="Email"
                     value={values.email}
@@ -157,7 +173,7 @@ export default class LoginScreen extends Component {
                       style={{
                         textAlign: 'center',
                         paddingVertical: 15,
-                        color: '#3b99fc',
+                        color: Colors.main_color,
                       }}>
                       New user ? go to Sign up
                     </Text>
@@ -220,7 +236,8 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   loginButton: {
-    // marginHorizontal: 25,
+    borderRadius: 50,
+    backgroundColor: Colors.main_color,
   },
 
   loading: {

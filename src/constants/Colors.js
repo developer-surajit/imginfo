@@ -1,5 +1,5 @@
 export default {
-  main_color: '#0095e7',
+  main_color: '#28574f',
   //   main_color: '#2874f0', // OLD values
   //   main_color: 'rgb(33,150,243)',
   main_color_light_1: '#e1f5fe',

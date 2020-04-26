@@ -13,6 +13,11 @@ import {
   ImageBackground,
   PermissionsAndroid,
   ToastAndroid,
+  TouchableHighlight,
+  ScrollView,
+  TouchableNativeFeedback,
+  TouchableWithoutFeedback,
+  Dimensions,
 } from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 import {Button} from 'react-native-elements';
@@ -21,6 +26,11 @@ import {Button} from 'react-native-elements';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MapView, {Marker} from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
+const placeHolderImg = require('./../assets/images/placeholder-1.jpg');
+import Colors from '../constants/Colors';
+import Modal from 'react-native-modal';
+const deviceWidth = Dimensions.get('window').width;
+const deviceHeight = Dimensions.get('window').height;
 // import {
 //   StepHeaderTitle,
 //   Header,
@@ -42,10 +52,19 @@ export default class HomeScreen extends Component {
     hasLocationPermission: false,
     userLocation: null,
     loading: true,
+    modalVisible: !true,
   };
 
   componentDidMount = () => {
     this.requestGpsPermission();
+    this.focusListener = this.props.navigation.addListener(
+      'willFocus',
+      payload => {
+        this.setState({
+          profileImageURI: null,
+        });
+      },
+    );
   };
 
   requestGpsPermission = async () => {
@@ -245,6 +264,12 @@ export default class HomeScreen extends Component {
     });
   };
 
+  setModalVisible(visible) {
+    this.setState({
+      modalVisible: visible,
+    });
+  }
+
   render() {
     return (
       <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
@@ -268,15 +293,47 @@ export default class HomeScreen extends Component {
             </Text>
           </View>
         ) : null}
+
+        <Modal
+          isVisible={this.state.modalVisible}
+          onBackdropPress={() => this.setModalVisible(false)}
+          deviceWidth={deviceWidth}
+          deviceHeight={deviceHeight}>
+          <View
+            style={{
+              backgroundColor: 'white',
+              paddingVertical: 50,
+              borderRadius: 10,
+            }}>
+            <Button
+              type="clear"
+              title="Take picture"
+              onPress={() => {
+                this.setModalVisible(false);
+                setTimeout(() => this.requestCameraPermission('TAKE'), 500);
+              }}
+              buttonStyle={{marginHorizontal: 25, marginBottom: 15}}
+            />
+            <Button
+              type="clear"
+              title="Choose from gallery"
+              onPress={() => {
+                this.setModalVisible(false);
+                setTimeout(() => this.requestCameraPermission('PICK'), 500);
+              }}
+              buttonStyle={{marginHorizontal: 25}}
+            />
+          </View>
+        </Modal>
+
         <View
           style={{
             flex: 1,
-            justifyContent: 'space-between',
+            // justifyContent: 'space-between',
             marginHorizontal: 15,
             padding: 10,
             borderRadius: 5,
             elevation: 1,
-            backgroundColor: 'white',
             marginBottom: 15,
             marginTop: 15,
           }}>
@@ -286,31 +343,21 @@ export default class HomeScreen extends Component {
                 flex: 1,
                 alignItems: 'center',
                 justifyContent: 'center',
+                overflow: 'hidden',
               }}>
-              <ImageBackground
-                blurRadius={
-                  this.state.profileImageURI && this.state.uploadImageSuccessful
-                    ? 0
-                    : 0
-                }
+              <Image
                 source={{
                   uri: this.state.profileImageURI,
                 }}
-                style={[styles.imageBgCenter]}
-                imageStyle={{
-                  borderRadius: 4,
-                  overflow: 'hidden',
+                resizeMode="contain"
+                style={{
+                  width: '100%',
+                  height: 200,
+                  // marginHorizontal: 15,
+                  resizeMode: 'contain',
+                  margin: 15,
                 }}
               />
-              {/* <Image
-                source={{uri: this.state.profileImageURI}}
-                style={{
-                  // width: '100%',
-                  height: 250,
-                  marginHorizontal: 15,
-                  resizeMode: 'contain',
-                }}
-              /> */}
             </View>
           ) : (
             <View
@@ -318,28 +365,29 @@ export default class HomeScreen extends Component {
                 flex: 1,
                 justifyContent: 'center',
               }}>
-              <Button
-                type="outline"
-                title="Take picture"
-                onPress={() => this.requestCameraPermission('TAKE')}
-                buttonStyle={{marginHorizontal: 25, marginBottom: 15}}
-              />
-              <Button
-                title="Choose from gallery"
-                onPress={() => this.requestCameraPermission('PICK')}
-                buttonStyle={{marginHorizontal: 25}}
+              <Image
+                source={placeHolderImg}
+                resizeMode="contain"
+                style={{
+                  width: '100%',
+                  height: 250,
+                  // marginHorizontal: 15,
+                  resizeMode: 'contain',
+                }}
               />
             </View>
           )}
-          {/* <MapView
-            style={{height: 200, width: '100%', marginTop: 20}}
-            initialRegion={{
-              latitude: 37.78825,
-              longitude: -122.4324,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
+          <Button
+            buttonStyle={{
+              borderRadius: 50,
+              backgroundColor: Colors.main_color,
             }}
-          /> */}
+            containerStyle={{marginHorizontal: 20, marginTop: 25}}
+            title="Take picture"
+            onPress={() => this.setState({modalVisible: true})}
+            titleStyle={{color: 'white'}}
+            // raised
+          />
           {!this.state.loading ? (
             <MapView
               style={{height: 200, width: '100%', marginTop: 20}}
@@ -352,7 +400,17 @@ export default class HomeScreen extends Component {
                 title="My location"
               />
             </MapView>
-          ) : null}
+          ) : (
+            <MapView
+              style={{height: 200, width: '100%', marginTop: 20}}
+              initialRegion={{
+                latitude: 37.78825,
+                longitude: -122.4324,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+              }}
+            />
+          )}
           <View
             style={{
               paddingTop: 15,
@@ -361,34 +419,23 @@ export default class HomeScreen extends Component {
             }}>
             <View style={styles.buttonContainer}>
               <Button
-                title="Remove"
-                type="outline"
-                buttonStyle={styles.editPlanButton}
-                containerStyle={{width: '30%', marginRight: 15}}
-                titleStyle={{fontSize: 13}}
-                onPress={() => this.setState({profileImageURI: null})}
-                disabled={!this.state.profileImageURI}
-              />
-              <Button
+                buttonStyle={{
+                  borderRadius: 50,
+                  backgroundColor: Colors.main_color,
+                }}
+                containerStyle={{marginHorizontal: 20}}
                 title="Continue"
-                buttonStyle={styles.startJourneyButton}
-                containerStyle={{flex: 1}}
-                titleStyle={{fontSize: 13}}
-                disabledStyle={{
-                  backgroundColor: 'rgba(0,0,0,0.15)',
-                }}
-                disabledTitleStyle={{
-                  color: 'rgba(0,0,0,0.25)',
-                }}
-                disabled={
-                  !this.state.profileImageURI || this.state.userLocation == null
-                }
                 onPress={() => {
                   this.props.navigation.navigate('DetailsSubmitScreen', {
                     userLocation: this.state.userLocation,
                     imgUrl: this.state.profileImageURI,
                   });
                 }}
+                titleStyle={{color: 'white'}}
+                // raised
+                disabled={
+                  !this.state.profileImageURI || this.state.userLocation == null
+                }
               />
             </View>
           </View>
@@ -417,6 +464,27 @@ const styles = StyleSheet.create({
     flex: 1,
     // marginVertical: 15, // was 20,
   },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
   editBtn: {
     width: 80,
     height: 80,
@@ -435,11 +503,11 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     top: 12,
   },
-  buttonContainer: {
-    // flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    // paddingHorizontal: 15,
-    alignItems: 'center',
-  },
+  // buttonContainer: {
+  //   // flex: 1,
+  //   flexDirection: 'row',
+  //   // justifyContent: 'space-between',
+  //   // paddingHorizontal: 15,
+  //   alignItems: 'center',
+  // },
 });

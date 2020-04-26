@@ -13,6 +13,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 import {universalApiCall} from './../utils/universalApiCall';
 import AsyncStorage from '@react-native-community/async-storage';
 import Spinner from 'react-native-loading-spinner-overlay';
+import Colors from '../constants/Colors';
 class DetailsSubmitScreen extends Component {
   constructor(props) {
     super(props);
@@ -117,16 +118,6 @@ class DetailsSubmitScreen extends Component {
           overlayColor="rgba(0,0,0,0.5)"
           textStyle={{color: 'white'}}
         />
-        <Text
-          style={{
-            marginBottom: 10,
-            fontSize: 16,
-            marginHorizontal: 15,
-            marginTop: 20,
-            color: '#333',
-          }}>
-          Image
-        </Text>
         {this.state.imgUrl ? (
           <Image
             source={{uri: this.state.imgUrl}}
@@ -137,6 +128,7 @@ class DetailsSubmitScreen extends Component {
               borderRadius: 4,
               overflow: 'hidden',
               resizeMode: 'contain',
+              marginTop: 50,
             }}
           />
         ) : null}
@@ -148,7 +140,7 @@ class DetailsSubmitScreen extends Component {
             marginTop: 20,
             color: '#333',
           }}>
-          Add comment
+          Description
         </Text>
         <View>
           <Input
@@ -170,8 +162,18 @@ class DetailsSubmitScreen extends Component {
             onChangeText={text => this.setState({comment: text})}
           />
         </View>
-
         <Button
+          buttonStyle={{
+            borderRadius: 50,
+            backgroundColor: Colors.main_color,
+          }}
+          containerStyle={{marginHorizontal: 20, marginTop: 25}}
+          title="Submit"
+          onPress={this.submitDetails}
+          titleStyle={{color: 'white'}}
+          disabled={!this.state.comment}
+        />
+        {/* <Button
           title="Submit"
           buttonStyle={{marginHorizontal: 15, marginTop: 25}}
           containerStyle={{flex: 1}}
@@ -186,7 +188,7 @@ class DetailsSubmitScreen extends Component {
           //   !this.state.profileImageURI || this.state.userLocation == null
           // }
           onPress={this.submitDetails}
-        />
+        /> */}
       </ScrollView>
     );
   }

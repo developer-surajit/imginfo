@@ -6,18 +6,20 @@ import {
   TouchableOpacity,
   Dimensions,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import {Button, Input, colors} from 'react-native-elements';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-
+const logo = require('./../assets/images/Logo.jpg');
 let PhoneRegex = /^[6-9]\d{9}$/;
 const deviceWidth = Dimensions.get('window').width;
 // import Colors from '../constants/Colors';
 // import isEmpty from '../utils/isEmpty';
 import {universalApiCall} from './../utils/universalApiCall';
 import Spinner from 'react-native-loading-spinner-overlay';
+import Colors from '../constants/Colors';
 export default class RegisterScreen extends Component {
   constructor(props) {
     super(props);
@@ -123,6 +125,18 @@ export default class RegisterScreen extends Component {
               // console.log({values}, {errors}, {touched});
               return (
                 <View style={styles.loginFormView}>
+                  <View style={{marginBottom: 50}}>
+                    <Image
+                      source={logo}
+                      style={{
+                        width: '100%',
+                        height: 150,
+                        borderRadius: 4,
+                        overflow: 'hidden',
+                        resizeMode: 'contain',
+                      }}
+                    />
+                  </View>
                   <Input
                     placeholder="Name"
                     value={values.name}
@@ -176,7 +190,7 @@ export default class RegisterScreen extends Component {
                       style={{
                         textAlign: 'center',
                         paddingVertical: 15,
-                        color: '#3b99fc',
+                        color: Colors.main_color,
                       }}>
                       Old user ? go to Sign in
                     </Text>
@@ -239,7 +253,8 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   loginButton: {
-    // marginHorizontal: 25,
+    borderRadius: 50,
+    backgroundColor: Colors.main_color,
   },
 
   loading: {
