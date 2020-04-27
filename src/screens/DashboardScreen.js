@@ -163,7 +163,7 @@ export default class DashboardScreen extends Component {
                 </Text>
               </View>
             }
-            keyExtractor={(item, i) => JSON.stringify(i)}
+            keyExtractor={(item, i) => item.datetime}
           />
 
           <View
