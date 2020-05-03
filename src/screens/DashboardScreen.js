@@ -16,6 +16,8 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import Colors from '../constants/Colors';
 import {universalApiCall} from '../utils/universalApiCall';
 import {Button, Divider} from 'react-native-elements';
+import {AppHeader} from '../shared/components';
+import RangeSlider from 'rn-range-slider';
 const placeHolderImg = require('./../assets/images/placeholder-1.jpg');
 const DATA = [
   {
@@ -28,6 +30,8 @@ export default class DashboardScreen extends Component {
   state = {
     loading: false,
     imgData: [],
+    rangeLow: null,
+    rangeHigh: null,
   };
 
   componentDidMount = () => {
@@ -64,6 +68,29 @@ export default class DashboardScreen extends Component {
   render() {
     return (
       <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
+        <AppHeader />
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Text style={{marginTop: 15, fontSize: 16}}>
+            Select your search range
+          </Text>
+          <RangeSlider
+            rangeEnabled={!true}
+            style={{width: '80%', height: 70}}
+            gravity={'bottom'}
+            min={5}
+            max={20}
+            step={1}
+            selectionColor="#3df"
+            blankColor="#f618"
+            onValueChanged={(low, high, fromUser) => {
+              this.setState({rangeLow: low, rangeHigh: high});
+            }}
+          />
+        </View>
         {this.state.permissionError ? (
           <View
             style={{
@@ -84,12 +111,12 @@ export default class DashboardScreen extends Component {
             </Text>
           </View>
         ) : null}
-        <Spinner
+        {/* <Spinner
           textContent="Loading.."
           visible={this.state.loading}
           overlayColor="rgba(0,0,0,0.5)"
           textStyle={{color: 'white'}}
-        />
+        /> */}
         <View
           style={{
             flex: 1,

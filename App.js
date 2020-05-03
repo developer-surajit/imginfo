@@ -16,13 +16,21 @@ import {
   StatusBar,
 } from 'react-native';
 
-import AppNavigation from './src/navigation/rootNavigation'
-export class App extends React.Component  {
-render (){
-  return (
-    <AppNavigation />
-  )
+import {MenuProvider} from 'react-native-popup-menu';
+import NavigationService from './src/navigation/NavigationService';
+import AppNavigation from './src/navigation/rootNavigation';
+export class App extends React.Component {
+  render() {
+    return (
+      <MenuProvider>
+        <AppNavigation
+          ref={navigatorRef => {
+            NavigationService.setTopLevelNavigator(navigatorRef);
+          }}
+        />
+      </MenuProvider>
+    );
+  }
 }
-};
 
 export default App;
