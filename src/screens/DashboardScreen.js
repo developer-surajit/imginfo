@@ -9,6 +9,7 @@ import {
   Dimensions,
   FlatList,
   ToastAndroid,
+  TouchableOpacity,
 } from 'react-native';
 
 import AsyncStorage from '@react-native-community/async-storage';
@@ -17,14 +18,8 @@ import Colors from '../constants/Colors';
 import {universalApiCall} from '../utils/universalApiCall';
 import {Button, Divider} from 'react-native-elements';
 import {AppHeader} from '../shared/components';
-import RangeSlider from 'rn-range-slider';
+import Slider from '@react-native-community/slider';
 const placeHolderImg = require('./../assets/images/placeholder-1.jpg');
-const DATA = [
-  {
-    name: 'brynn',
-    avatar: 'https://s3.amazonaws.com/uifaces/faces/twitter/brynn/128.jpg',
-  },
-];
 
 export default class DashboardScreen extends Component {
   state = {
@@ -32,6 +27,7 @@ export default class DashboardScreen extends Component {
     imgData: [],
     rangeLow: null,
     rangeHigh: null,
+    range: 5,
   };
 
   componentDidMount = () => {
@@ -61,7 +57,7 @@ export default class DashboardScreen extends Component {
       this.setState({
         loading: false,
       });
-      console.log(error, 'in dashboard get data');
+      console.log(error, error.response, 'in dashboard get data');
     }
   };
 
@@ -75,19 +71,19 @@ export default class DashboardScreen extends Component {
             alignItems: 'center',
           }}>
           <Text style={{marginTop: 15, fontSize: 16}}>
-            Select your search range
+            Searching withing {this.state.range}km range
           </Text>
-          <RangeSlider
-            rangeEnabled={!true}
-            style={{width: '80%', height: 70}}
-            gravity={'bottom'}
-            min={5}
-            max={20}
+
+          <Slider
+            style={{width: '70%', height: 40}}
+            minimumValue={5}
+            maximumValue={20}
             step={1}
-            selectionColor="#3df"
-            blankColor="#f618"
-            onValueChanged={(low, high, fromUser) => {
-              this.setState({rangeLow: low, rangeHigh: high});
+            minimumTrackTintColor={Colors.main_color}
+            maximumTrackTintColor="#000000"
+            onSlidingComplete={range => {
+              console.log(range);
+              this.setState({range});
             }}
           />
         </View>
@@ -132,7 +128,14 @@ export default class DashboardScreen extends Component {
             // data={DATA}
             data={this.state.imgData}
             renderItem={({item}) => (
-              <View style={{marginBottom: 25}}>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={{marginBottom: 25}}
+                onPress={() =>
+                  this.props.navigation.navigate('ProductDeatilsScreen', {
+                    product_id: item.product_id,
+                  })
+                }>
                 <Image
                   source={{
                     uri: `https://iodroid.in/redfrugten/uploads/${item.image}`,
@@ -162,7 +165,7 @@ export default class DashboardScreen extends Component {
                 <Divider
                   style={{backgroundColor: 'rgba(0,0,0,0.25)', marginTop: 15}}
                 />
-              </View>
+              </TouchableOpacity>
             )}
             ListEmptyComponent={
               <View
@@ -190,7 +193,7 @@ export default class DashboardScreen extends Component {
                 </Text>
               </View>
             }
-            keyExtractor={(item, i) => item.datetime}
+            keyExtractor={(item, i) => item.product_id}
           />
 
           <View

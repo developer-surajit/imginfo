@@ -76,8 +76,11 @@ export default class AppHeader extends Component {
               <MenuOption onSelect={() => alert(`Delete`)}>
                 <Text style={styles.optionsTitle}>Settings</Text>
               </MenuOption>
-              <MenuOption onSelect={() => alert(`Delete`)}>
-                <Text style={styles.optionsTitle}>Requests</Text>
+              <MenuOption
+                onSelect={() =>
+                  NavigationService.navigate('RequestListScreen')
+                }>
+                <Text style={styles.optionsTitle}>All Requests</Text>
               </MenuOption>
               <MenuOption onSelect={() => alert(`Delete`)}>
                 <Text style={styles.optionsTitle}>Logout</Text>
