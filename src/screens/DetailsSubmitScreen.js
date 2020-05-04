@@ -15,6 +15,16 @@ import AsyncStorage from '@react-native-community/async-storage';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Colors from '../constants/Colors';
 import {StackActions, NavigationActions} from 'react-navigation';
+import RadioForm, {
+  RadioButton,
+  RadioButtonInput,
+  RadioButtonLabel,
+} from 'react-native-simple-radio-button';
+var radio_props = [
+  {label: 'Public', value: 'public'},
+  {label: 'Private', value: 'private'},
+];
+
 class DetailsSubmitScreen extends Component {
   constructor(props) {
     super(props);
@@ -24,6 +34,7 @@ class DetailsSubmitScreen extends Component {
       comment: '',
       userId: null,
       loading: true,
+      property_type: 'public',
     };
   }
 
@@ -42,23 +53,23 @@ class DetailsSubmitScreen extends Component {
     // this.createFormData(imgUrl);
   };
 
-  createFormData = photo => {
-    const data = new FormData();
-    data.append('photo', {
-      name: photo.split('/').pop(),
-      uri: Platform.OS === 'android' ? photo : photo.replace('file://', ''),
-      type: 'image/jpeg',
-    });
+  // createFormData = photo => {
+  //   const data = new FormData();
+  //   data.append('photo', {
+  //     name: photo.split('/').pop(),
+  //     uri: Platform.OS === 'android' ? photo : photo.replace('file://', ''),
+  //     type: 'image/jpeg',
+  //   });
 
-    console.log(data, 'imgData');
+  //   console.log(data, 'imgData');
 
-    return data;
-  };
+  //   return data;
+  // };
 
   submitDetails = async () => {
     // let imgData = this.createFormData(this.state.imgUrl);
     try {
-      let {userLocation, imgUrl, userId, comment} = this.state;
+      let {userLocation, imgUrl, userId, comment, property_type} = this.state;
       if (!!!comment) {
         ToastAndroid.show('Please enter comment', 1500);
         return;
@@ -73,6 +84,7 @@ class DetailsSubmitScreen extends Component {
       const imgName = imgUrl.split('/').pop();
 
       submitData.append('user_id', userId);
+      submitData.append('property_type', property_type);
       submitData.append('desc', comment);
       submitData.append('lat', userLocation.latitude);
       submitData.append('lon', userLocation.longitude);
@@ -119,6 +131,13 @@ class DetailsSubmitScreen extends Component {
   };
 
   render() {
+    // let radio_props =
+    //   storeData.delivery_type == 'both'
+    //     ? [{label: 'Pickup', value: 0}, {label: 'Home Delivery', value: 1}]
+    //     : storeData.delivery_type === 'pickup'
+    //     ? [{label: 'Pickup', value: 0}]
+    //     : [{label: 'Home Delivery', value: 0}];
+    console.log(this.state, 'state in submit');
     return (
       <ScrollView style={{flex: 1}} keyboardShouldPersistTaps="always">
         <Spinner
@@ -167,6 +186,7 @@ class DetailsSubmitScreen extends Component {
               marginTop: 10,
               paddingHorizontal: 10,
               marginHorizontal: 5,
+              marginBottom: 15,
             }}
             value={this.state.comment}
             placeholder="Comment"
@@ -179,6 +199,19 @@ class DetailsSubmitScreen extends Component {
             onChangeText={text => this.setState({comment: text})}
           />
         </View>
+
+        <View style={{paddingHorizontal: 15}}>
+          <Text style={{marginBottom: 10}}>Property type</Text>
+          <RadioForm
+            radio_props={radio_props}
+            initial={0}
+            buttonSize={14}
+            onPress={value => {
+              this.setState({property_type: value});
+            }}
+          />
+        </View>
+
         <Button
           buttonStyle={{
             borderRadius: 50,

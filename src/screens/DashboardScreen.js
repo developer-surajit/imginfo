@@ -71,7 +71,7 @@ export default class DashboardScreen extends Component {
             alignItems: 'center',
           }}>
           <Text style={{marginTop: 15, fontSize: 16}}>
-            Searching withing {this.state.range}km range
+            Searching withing {this.state.range} km range
           </Text>
 
           <Slider
@@ -107,12 +107,12 @@ export default class DashboardScreen extends Component {
             </Text>
           </View>
         ) : null}
-        {/* <Spinner
+        <Spinner
           textContent="Loading.."
           visible={this.state.loading}
           overlayColor="rgba(0,0,0,0.5)"
           textStyle={{color: 'white'}}
-        /> */}
+        />
         <View
           style={{
             flex: 1,

@@ -222,11 +222,11 @@ export default class HomeScreen extends Component {
 
   takePicture = () => {
     ImagePicker.openCamera({
-      width: 900,
-      height: 1200,
+      width: 600,
+      height: 600,
       cropping: false,
-      compressImageQuality: 0.9,
-      // compressImageMaxWidth: 900,
+      compressImageQuality: 0.3,
+      compressImageMaxWidth: 600,
     })
       .then(selectedImage => {
         console.log({selectedImage});
