@@ -10,6 +10,9 @@ import {
   FlatList,
   ToastAndroid,
   TouchableOpacity,
+  Platform,
+  BackHandler,
+  Alert,
 } from 'react-native';
 
 import AsyncStorage from '@react-native-community/async-storage';
@@ -20,18 +23,72 @@ import {Button, Divider} from 'react-native-elements';
 import {AppHeader} from '../shared/components';
 import Slider from '@react-native-community/slider';
 const placeHolderImg = require('./../assets/images/placeholder-1.jpg');
+import requestGpsPermission from '../utils/requestGpsPermission';
+import enableGpsAndroid from '../utils/enableGpsAndroid';
+import getUserLocation from '../utils/getUserLocation';
 
 export default class DashboardScreen extends Component {
   state = {
-    loading: false,
+    loading: true,
     imgData: [],
     rangeLow: null,
     rangeHigh: null,
-    range: 5,
+    range: 50,
   };
 
   componentDidMount = () => {
-    this.getPhotoList();
+    this.askPermissionAndGetLocation();
+  };
+
+  askPermissionAndGetLocation = async () => {
+    try {
+      let checkGpsPermission = await requestGpsPermission();
+      console.log('checkGpsPermission', checkGpsPermission);
+      if (checkGpsPermission.type == 'granted') {
+        // check if the gps is on in the device
+        if (Platform.OS === 'android') {
+          let enableGps = await enableGpsAndroid();
+          if (enableGps == 'enabled' || enableGps == 'already-enabled') {
+            // then ask user's location
+            let userLocation = await getUserLocation();
+            if (userLocation.mocked) {
+              // Alert.alert(
+              //   'Mocked Location',
+              //   `Please turn off mocked location and try again.`,
+              //   [
+              //     {
+              //       text: 'Try again',
+              //       onPress: () => this.askPermissionAndGetLocation(),
+              //     },
+              //     {
+              //       text: 'Exit App',
+              //       onPress: () => BackHandler.exitApp(),
+              //       style: 'cancel',
+              //     },
+              //   ],
+              // );
+              this.setState(
+                {
+                  userLocation: userLocation.userLocation,
+                },
+                () => this.getPhotoList(),
+              );
+            } else {
+              this.setState(
+                {
+                  userLocation: userLocation.userLocation,
+                },
+                () => this.getPhotoList(),
+              );
+            }
+          }
+        }
+
+        // this.getLocation();
+      }
+    } catch (error) {
+      console.log(error, 'askPermissionAndGetLocation');
+    }
   };
 
   getPhotoList = async () => {
@@ -41,18 +98,30 @@ export default class DashboardScreen extends Component {
       });
       let userId = await AsyncStorage.getItem('user_id');
 
-      let data = await universalApiCall('/listpointlocationbyuser', 'POST', {
-        user_id: JSON.parse(userId),
-      });
+      let data = await universalApiCall(
+        '/listpointlocationbyuserandredius',
+        'POST',
+        {
+          user_id: JSON.parse(userId),
+          radius: 200,
+          // lat: 23.3097715,
+          // lon: 87.3766212,
+          lat: this.state.userLocation.latitude,
+          lon: this.state.userLocation.longitude,
+        },
+      );
 
       if (data.data.status) {
         this.setState({
-          loading: false,
           imgData: data.data.result,
         });
       }
 
-      console.log(data);
+      this.setState({
+        loading: false,
+      });
+
+      console.log(data, 'search by radius');
     } catch (error) {
       this.setState({
         loading: false,
@@ -76,14 +145,15 @@ export default class DashboardScreen extends Component {
 
           <Slider
             style={{width: '70%', height: 40}}
-            minimumValue={5}
-            maximumValue={20}
-            step={1}
+            minimumValue={1}
+            maximumValue={200}
+            step={5}
+            value={this.state.range}
             minimumTrackTintColor={Colors.main_color}
             maximumTrackTintColor="#000000"
             onSlidingComplete={range => {
               console.log(range);
-              this.setState({range});
+              this.setState({range}, () => this.askPermissionAndGetLocation());
             }}
           />
         </View>

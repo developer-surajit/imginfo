@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Colors from '../../constants/Colors';
 import NavigationService from '../../navigation/NavigationService';
+import AsyncStorage from '@react-native-community/async-storage';
 import {
   Menu,
   MenuOptions,
@@ -19,6 +20,15 @@ export default class AppHeader extends Component {
 
     // this.pickerRef = React.createRef();
   }
+
+  logoutUser = async () => {
+    try {
+      let logoutUserNow = await AsyncStorage.removeItem('user_id');
+      NavigationService.navigate('Auth');
+    } catch (error) {
+      console.log(error, 'in logout');
+    }
+  };
 
   goBack = () => {
     if (this.props.onBackPress) {
@@ -70,10 +80,10 @@ export default class AppHeader extends Component {
               />
             </MenuTrigger>
             <MenuOptions>
-              <MenuOption onSelect={() => alert(`Delete`)}>
+              <MenuOption onSelect={() => alert(`Not implemented`)}>
                 <Text style={styles.optionsTitle}>Change Language</Text>
               </MenuOption>
-              <MenuOption onSelect={() => alert(`Delete`)}>
+              <MenuOption onSelect={() => alert(`Not implemented`)}>
                 <Text style={styles.optionsTitle}>Settings</Text>
               </MenuOption>
               <MenuOption
@@ -82,7 +92,7 @@ export default class AppHeader extends Component {
                 }>
                 <Text style={styles.optionsTitle}>All Requests</Text>
               </MenuOption>
-              <MenuOption onSelect={() => alert(`Delete`)}>
+              <MenuOption onSelect={() => this.logoutUser()}>
                 <Text style={styles.optionsTitle}>Logout</Text>
               </MenuOption>
             </MenuOptions>

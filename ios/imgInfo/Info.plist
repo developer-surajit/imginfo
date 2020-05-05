@@ -39,6 +39,10 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Need user's location to show products nearby</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Need user's location to show products nearby</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Need user's location to show products nearby</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>For choosing a photo.</string>
 	<key>NSCameraUsageDescription</key>

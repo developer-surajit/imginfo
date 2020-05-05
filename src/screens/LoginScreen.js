@@ -46,25 +46,27 @@ export default class LoginScreen extends Component {
         loading: true,
       });
       let {name, email, password} = values;
-      let register = await universalApiCall('/userLogin', 'POST', {
+      let login = await universalApiCall('/userLogin', 'POST', {
         email,
         password,
       });
 
-      if (register.data.status) {
-        this.setState({
-          loading: false,
-        });
+      if (login.data.status) {
         ToastAndroid.show('Login successfully', 1000);
-        this.saveDetails(register.data.result);
+        this.saveDetails(login.data.result);
+      } else {
+        ToastAndroid.show('Sorry, Please enter valid login creadentials', 1000);
       }
-      console.log(register);
+      this.setState({
+        loading: false,
+      });
+      console.log(login);
       console.log(values);
     } catch (error) {
       this.setState({
         loading: false,
       });
-      alert('Something went wrong, please try again');
+      alert('Sorry, Please enter valid login creadentials ');
       console.log(error.response);
     }
   };
