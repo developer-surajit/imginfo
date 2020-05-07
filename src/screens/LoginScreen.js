@@ -20,8 +20,9 @@ let PhoneRegex = /^[6-9]\d{9}$/;
 const deviceWidth = Dimensions.get('window').width;
 const logo = require('./../assets/images/Logo.jpg');
 import Colors from '../constants/Colors';
-
-export default class LoginScreen extends Component {
+import {connect} from 'react-redux';
+import {setUserDetailsAction} from '../redux/actions';
+class LoginScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -60,7 +61,8 @@ export default class LoginScreen extends Component {
       this.setState({
         loading: false,
       });
-      console.log(login);
+
+      console.log({login});
       console.log(values);
     } catch (error) {
       this.setState({
@@ -74,6 +76,9 @@ export default class LoginScreen extends Component {
   saveDetails = async data => {
     try {
       await AsyncStorage.setItem('user_id', JSON.stringify(data.id));
+      this.props.setUserDetailsAction({
+        user_id: data.id,
+      });
       this.props.navigation.navigate('App');
     } catch (error) {
       console.log(error);
@@ -256,3 +261,10 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
 });
+
+export default connect(
+  null,
+  {
+    setUserDetailsAction,
+  },
+)(LoginScreen);

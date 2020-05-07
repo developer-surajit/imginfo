@@ -7,19 +7,25 @@
  */
 
 import React from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-} from 'react-native';
-
 import {MenuProvider} from 'react-native-popup-menu';
 import NavigationService from './src/navigation/NavigationService';
 import AppNavigation from './src/navigation/rootNavigation';
+
+import NetInfo from '@react-native-community/netinfo';
+import {checkNetworkAction} from './src/redux/actions';
+import {connect} from 'react-redux';
+
 export class App extends React.Component {
+  componentDidMount = () => {
+    this.NetInfoEvent = NetInfo.addEventListener(state => {
+      this.props.checkNetworkAction(state);
+    });
+  };
+
+  componentWillUnmount() {
+    this.NetInfoEvent();
+  }
+
   render() {
     return (
       <MenuProvider>
@@ -33,4 +39,7 @@ export class App extends React.Component {
   }
 }
 
-export default App;
+export default connect(
+  null,
+  {checkNetworkAction},
+)(App);

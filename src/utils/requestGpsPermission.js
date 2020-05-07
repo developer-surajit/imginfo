@@ -6,6 +6,7 @@ import {
   PERMISSIONS,
   RESULTS,
   requestMultiple,
+  request,
 } from 'react-native-permissions';
 
 const requestGpsPermission = async () => {
@@ -35,11 +36,13 @@ const requestGpsPermission = async () => {
           }
         })
         .catch(error => {
-          console.log('error in catch permission camera');
+          console.log('error in catch permission GPS');
+          return rej({type: 'error_GPS_permission', error});
         });
     } else {
       check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION)
         .then(result => {
+          console.log('result permission GPS', result);
           switch (result) {
             case RESULTS.UNAVAILABLE:
               console.log(
@@ -73,6 +76,7 @@ const requestGpsPermission = async () => {
         })
         .catch(error => {
           console.log('error in catch permission location');
+          return rej({type: 'error_GPS_permission', error});
         });
     }
   });

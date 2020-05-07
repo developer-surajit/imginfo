@@ -86,6 +86,8 @@ class DetailsSubmitScreen extends Component {
       submitData.append('user_id', userId);
       submitData.append('property_type', property_type);
       submitData.append('desc', comment);
+      // submitData.append('lat', '23.171292');
+      // submitData.append('lon', '87.865407');
       submitData.append('lat', userLocation.latitude);
       submitData.append('lon', userLocation.longitude);
       submitData.append('image', {

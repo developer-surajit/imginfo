@@ -25,7 +25,8 @@ import requestCameraPermission from './../utils/requestCameraPermission';
 import ImagePicker from 'react-native-image-crop-picker';
 import moment from 'moment';
 import AsyncStorage from '@react-native-community/async-storage';
-
+import {connect} from 'react-redux';
+const placeHolderImg = require('./../assets/images/placeholder-1.jpg');
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = 0.0421;
 
@@ -53,6 +54,8 @@ class ProductDeatilsScreen extends Component {
       uploadImageSuccessful: false,
       profileImageURI: null,
       ready: true,
+      rating: 0,
+      imageArray: [],
     };
 
     this.map = React.createRef();
@@ -107,7 +110,7 @@ class ProductDeatilsScreen extends Component {
         // this.setRegion(region);
       }
 
-      console.log(data, 'product details');
+      console.log(data.data.result[0], 'product details');
     } catch (error) {
       this.setState({
         loading: false,
@@ -135,22 +138,23 @@ class ProductDeatilsScreen extends Component {
   };
 
   handleGetDirections = () => {
-    // const data = {
-    //   source: {
-    //     ...this.props.currentLocation,
-    //   },
-    //   destination: {
-    //     latitude: this.props.data.retailer.latitude,
-    //     longitude: this.props.data.retailer.longitude,
-    //   },
-    //   params: [
-    //     {
-    //       key: 'travelmode',
-    //       value: 'driving', // may be "walking", "bicycling" or "transit" as well
-    //     },
-    //   ],
-    // };
-    // getDirections(data);
+    let {region} = this.state;
+    const data = {
+      source: {
+        ...this.props.userLocation,
+      },
+      destination: {
+        latitude: region.latitude,
+        longitude: region.longitude,
+      },
+      params: [
+        {
+          key: 'travelmode',
+          value: 'driving', // may be "walking", "bicycling" or "transit" as well
+        },
+      ],
+    };
+    getDirections(data);
   };
 
   requestOwner = () => {
@@ -211,9 +215,10 @@ class ProductDeatilsScreen extends Component {
       );
 
       if (data.data.status) {
-        this.setState({
-          loading: false,
-        });
+        this.getProductDetails();
+        // this.setState({
+        //   loading: false,
+        // });
         ToastAndroid.show('Image uploaded successfully', 1500);
       }
 
@@ -240,9 +245,9 @@ class ProductDeatilsScreen extends Component {
   submitRating = async rating => {
     console.log('Rating is: ' + rating);
     try {
-      this.setState({
-        loading: true,
-      });
+      // this.setState({
+      //   loading: true,
+      // });
 
       let data = await universalApiCall('/addratingbyuser', 'POST', {
         product_id: this.state.product_id,
@@ -250,9 +255,9 @@ class ProductDeatilsScreen extends Component {
         rating: rating,
       });
 
-      this.setState({
-        loading: false,
-      });
+      // this.setState({
+      //   loading: false,
+      // });
 
       if (data.data.status) {
         ToastAndroid.show('Your rating is successful!!', 1500);
@@ -268,25 +273,28 @@ class ProductDeatilsScreen extends Component {
   };
 
   render() {
-    if (this.state.loading) {
-      return (
-        // <View>
-        //   <Text>Loading</Text>
-        // </View>
-        <Spinner
-          textContent="Loading.."
-          visible={this.state.loading}
-          overlayColor="rgba(0,0,0,0.5)"
-          textStyle={{color: 'white'}}
-        />
-      );
-    }
+    // if (this.state.loading) {
+    //   return (
+    //     // <View>
+    //     //   <Text>Loading</Text>
+    //     // </View>
+    //     <Spinner
+    //       textContent="Loading.."
+    //       visible={this.state.loading}
+    //       overlayColor="rgba(0,0,0,0.5)"
+    //       textStyle={{color: 'white'}}
+    //     />
+    //   );
+    // }
 
-    let {property_type, average_rating} = this.state.productData;
+    // let property_type = 'public';
+    // average_rating;
 
-    if (!!!property_type) {
-      property_type = 'public';
-    }
+    // if (this.state.productData && !!!property_type) {
+    //   property_type = 'public';
+    // } else {
+    //   property_type = this.state.productData.property_type;
+    // }
 
     // let images = [`https://iodroid.in/redfrugten/uploads/${product_image}`];
 
@@ -294,28 +302,64 @@ class ProductDeatilsScreen extends Component {
 
     // });
 
+    console.log('state', this.state);
+
     return (
       <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
         <ScrollView>
-          <View style={{flexBasis: 250}}>
-            <ImageSlider
-              loopBothSides
-              autoPlayWithInterval={3000}
-              images={this.state.imageArray}
-              customSlide={({index, item, style, width}) => (
-                // It's important to put style here because it's got offset inside
-                <View
-                  key={index}
-                  style={[style, styles.customSlide, styles.slider]}>
-                  <Image
-                    source={{uri: item}}
-                    style={[styles.customImage, {resizeMode: 'cover'}]}
-                  />
-                </View>
-              )}
-            />
-          </View>
-
+          {!this.state.loading ? (
+            <View style={{flexBasis: 250}}>
+              <ImageSlider
+                loopBothSides
+                autoPlayWithInterval={3000}
+                images={this.state.imageArray}
+                customSlide={({index, item, style, width}) => (
+                  // It's important to put style here because it's got offset inside
+                  <View
+                    key={index}
+                    style={[style, styles.customSlide, styles.slider]}>
+                    <Image
+                      source={{uri: item}}
+                      style={[styles.customImage, {resizeMode: 'cover'}]}
+                    />
+                  </View>
+                )}
+              />
+            </View>
+          ) : (
+            <View
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+              }}>
+              <Image
+                source={placeHolderImg}
+                resizeMode="contain"
+                style={{
+                  width: '100%',
+                  height: 250,
+                  resizeMode: 'cover',
+                  borderRadius: 4,
+                }}
+              />
+              {!this.state.loading ? (
+                <Text
+                  style={{
+                    fontSize: 16,
+                    marginTop: 15,
+                    paddingLeft: 5,
+                  }}>
+                  No image found
+                </Text>
+              ) : null}
+            </View>
+          )}
+          <Spinner
+            textContent="Loading.."
+            visible={this.state.loading}
+            overlayColor="rgba(0,0,0,0.5)"
+            textStyle={{color: 'white'}}
+          />
           <View
             style={{
               flexDirection: 'row',
@@ -345,29 +389,19 @@ class ProductDeatilsScreen extends Component {
                   marginBottom: 5,
                 }}>
                 {' '}
-                Average Rating: {average_rating}
+                Average Rating:{' '}
+                {this.state.productData && this.state.productData.rating
+                  ? this.state.productData.rating
+                  : '0'}
               </Text>
               <AirbnbRating
                 count={5}
-                defaultRating={0}
+                defaultRating={this.state.rating}
                 size={20}
                 showRating={false}
-                onFinishRating={e =>
-                  Alert.alert(
-                    'Add rating',
-                    'Are you sure you want to rate this ?',
-                    [
-                      {
-                        text: 'Yes',
-                        onPress: () => this.submitRating(e),
-                      },
-                      {
-                        text: 'Cancel',
-                        style: 'cancel',
-                      },
-                    ],
-                  )
-                }
+                onFinishRating={e => {
+                  this.submitRating(e);
+                }}
               />
             </View>
           </View>
@@ -376,14 +410,16 @@ class ProductDeatilsScreen extends Component {
               {!isEmpty(this.state.productData) ? (
                 <Text>
                   Property type :{' '}
-                  {!isEmpty(property_type) ? property_type : 'public'}
+                  {!isEmpty(this.state.productData)
+                    ? this.state.productData.property_type
+                    : 'public'}
                 </Text>
               ) : null}
               {this.state.productData ? (
                 <MapView
                   ref={this.map}
-                  style={{height: 300, width: '100%', marginTop: 10}}
-                  // initialRegion={initialRegion}
+                  style={{height: 200, width: '100%', marginTop: 10}}
+                  initialRegion={initialRegion}
                   region={this.state.region}>
                   <Marker
                     coordinate={this.state.region}
@@ -396,46 +432,47 @@ class ProductDeatilsScreen extends Component {
             <View>
               <MapView
                 style={{height: 200, width: '100%', marginTop: 10}}
-                initialRegion={{
-                  latitude: 37.78825,
-                  longitude: -122.4324,
-                  latitudeDelta: 0.0922,
-                  longitudeDelta: 0.0421,
-                }}
+                initialRegion={this.props.userLocation}
               />
             </View>
           )}
 
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent:
-                property_type == 'private' ? 'space-between' : 'center',
-              alignItems: 'center',
-              paddingHorizontal: 15,
-              paddingVertical: 10,
-            }}>
-            <Button
-              buttonStyle={styles.btnStyle}
-              title="Navigate"
-              onPress={() => {
-                this.handleGetDirections();
-              }}
-              titleStyle={{color: 'white'}}
-            />
-            {property_type == 'private' ? (
+          {!this.state.loading ? (
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent:
+                  this.state.productData &&
+                  this.state.productData.property_type == 'private'
+                    ? 'space-between'
+                    : 'center',
+                alignItems: 'center',
+                paddingHorizontal: 15,
+                paddingVertical: 10,
+              }}>
               <Button
                 buttonStyle={styles.btnStyle}
-                title="Request Owner"
+                title="Navigate"
                 onPress={() => {
-                  this.setState({
-                    showDatePicker: true,
-                  });
+                  this.handleGetDirections();
                 }}
                 titleStyle={{color: 'white'}}
               />
-            ) : null}
-          </View>
+              {this.state.productData &&
+              this.state.productData.property_type == 'private' ? (
+                <Button
+                  buttonStyle={styles.btnStyle}
+                  title="Request Owner"
+                  onPress={() => {
+                    this.setState({
+                      showDatePicker: true,
+                    });
+                  }}
+                  titleStyle={{color: 'white'}}
+                />
+              ) : null}
+            </View>
+          ) : null}
 
           {this.state.showDatePicker && (
             <DateTimePicker
@@ -548,4 +585,9 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProductDeatilsScreen;
+const mapStateToProps = state => ({
+  checkNetworkReducer: state.checkNetworkReducer,
+  userLocation: state.userLocationReducer.userLocation,
+});
+
+export default connect(mapStateToProps)(ProductDeatilsScreen);

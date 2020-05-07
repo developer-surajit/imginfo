@@ -13,6 +13,7 @@ import {
   Platform,
   BackHandler,
   Alert,
+  Linking,
 } from 'react-native';
 
 import AsyncStorage from '@react-native-community/async-storage';
@@ -26,8 +27,38 @@ const placeHolderImg = require('./../assets/images/placeholder-1.jpg');
 import requestGpsPermission from '../utils/requestGpsPermission';
 import enableGpsAndroid from '../utils/enableGpsAndroid';
 import getUserLocation from '../utils/getUserLocation';
+// import {SET_LOCATION} from '../constants/types';
+import {setLocationAction} from '../redux/actions';
+import {connect} from 'react-redux';
 
-export default class DashboardScreen extends Component {
+let DATA = [
+  {
+    avg_rating: '5',
+    datetime: '2020-05-06 14:14:27',
+    desc: 'postman test',
+    distance_val: 0,
+    image: 'image/1588747904splash.jpeg',
+    lat: '23.1078175',
+    lon: '87.071008',
+    product_id: '43',
+    property_type: 'private',
+    user_id: '45',
+  },
+  {
+    avg_rating: '0',
+    datetime: '2020-05-06 06:49:06',
+    desc: 'Testing org lat lng',
+    distance_val: 0,
+    image: 'image/1588747746c8a277f9-9191-4f78-91a7-a87d6822f62e.jpg',
+    lat: '23.1078175',
+    lon: '87.071008',
+    product_id: '42',
+    property_type: 'public',
+    user_id: '45',
+  },
+];
+
+class DashboardScreen extends Component {
   state = {
     loading: true,
     imgData: [],
@@ -67,6 +98,7 @@ export default class DashboardScreen extends Component {
               //     },
               //   ],
               // );
+              this.props.setLocationAction(userLocation);
               this.setState(
                 {
                   userLocation: userLocation.userLocation,
@@ -74,6 +106,7 @@ export default class DashboardScreen extends Component {
                 () => this.getPhotoList(),
               );
             } else {
+              this.props.setLocationAction(userLocation);
               this.setState(
                 {
                   userLocation: userLocation.userLocation,
@@ -88,6 +121,54 @@ export default class DashboardScreen extends Component {
       }
     } catch (error) {
       console.log(error, 'askPermissionAndGetLocation');
+      if (error.type == 'error_GPS_disabled') {
+        Alert.alert(
+          'GPS Disabled',
+          'Please enable GPS to search for nearby stores',
+          [
+            {
+              text: 'Try again',
+              onPress: () => this.askPermissionAndGetLocation(),
+            },
+            {
+              text: 'Close App',
+              onPress: () => {
+                BackHandler.exitApp();
+              },
+              style: 'cancel',
+            },
+          ],
+        );
+      } else if (
+        error.type == 'error_GPS_permission' ||
+        error.type == 'blocked'
+      ) {
+        Alert.alert(
+          'Location Permission Denied',
+          "Please allow app's location permission to search nearby stores",
+          [
+            {
+              text: 'Change permission',
+              onPress: () => this.openSettings(),
+            },
+            {
+              text: 'Close App',
+              onPress: () => {
+                BackHandler.exitApp();
+              },
+              style: 'cancel',
+            },
+          ],
+        );
+      }
+    }
+  };
+
+  openSettings = async () => {
+    try {
+      await Linking.openSettings();
+    } catch (error) {
+      console.log('error in openSettings', error);
     }
   };
 
@@ -102,8 +183,8 @@ export default class DashboardScreen extends Component {
         '/listpointlocationbyuserandredius',
         'POST',
         {
-          user_id: JSON.parse(userId),
-          radius: 200,
+          // user_id: JSON.parse(userId),
+          redius: this.state.range,
           // lat: 23.3097715,
           // lon: 87.3766212,
           lat: this.state.userLocation.latitude,
@@ -126,6 +207,7 @@ export default class DashboardScreen extends Component {
       this.setState({
         loading: false,
       });
+      ToastAndroid.show('Something is wrong, try again', 1000);
       console.log(error, error.response, 'in dashboard get data');
     }
   };
@@ -138,6 +220,7 @@ export default class DashboardScreen extends Component {
           style={{
             justifyContent: 'center',
             alignItems: 'center',
+            marginBottom: 5,
           }}>
           <Text style={{marginTop: 15, fontSize: 16}}>
             Searching withing {this.state.range} km range
@@ -187,61 +270,69 @@ export default class DashboardScreen extends Component {
           style={{
             flex: 1,
             // justifyContent: 'space-between',
-            marginHorizontal: 15,
+            // marginHorizontal: 15,
             // padding: 10,
             borderRadius: 5,
             // elevation: 1,
             marginBottom: 15,
-            marginTop: 15,
+            marginTop: 10,
           }}>
           <FlatList
             // data={DATA}
             data={this.state.imgData}
             renderItem={({item}) => (
-              <TouchableOpacity
-                activeOpacity={0.8}
-                style={{marginBottom: 25}}
-                onPress={() =>
-                  this.props.navigation.navigate('ProductDeatilsScreen', {
-                    product_id: item.product_id,
-                  })
-                }>
-                <Image
-                  source={{
-                    uri: `https://iodroid.in/redfrugten/uploads/${item.image}`,
-                  }}
-                  resizeMode="contain"
-                  style={{
-                    width: '100%',
-                    height: 200,
-                    // marginHorizontal: 15,
-                    resizeMode: 'cover',
-                    borderRadius: 4,
-                  }}
-                />
-                <Text
-                  style={{
-                    fontSize: 16,
-                    marginTop: 15,
-                    fontFamily: 'sans-serif-medium',
-                    paddingLeft: 5,
-                  }}>
-                  Description :{' '}
+              <View
+                style={{
+                  elevation: 5,
+                  marginBottom: 15,
+                  backgroundColor: 'white',
+                  marginHorizontal: 15,
+                  borderRadius: 4,
+                }}>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  // style={{marginBottom: 25}}
+                  onPress={() =>
+                    this.props.navigation.navigate('ProductDeatilsScreen', {
+                      product_id: item.product_id,
+                    })
+                  }>
+                  <Image
+                    source={{
+                      uri: `https://iodroid.in/redfrugten/uploads/${item.image}`,
+                    }}
+                    resizeMode="contain"
+                    style={{
+                      width: '100%',
+                      height: 200,
+                      // marginHorizontal: 15,
+                      resizeMode: 'cover',
+                      // borderRadius: 4,
+                    }}
+                  />
                   <Text
-                    style={{fontSize: 16, fontFamily: 'sans-serif-regular'}}>
-                    {item.desc}
+                    style={{
+                      fontSize: 16,
+                      // marginTop: 15,
+                      fontFamily: 'sans-serif-medium',
+                      paddingVertical: 15,
+                      paddingHorizontal: 15,
+                    }}>
+                    Description :{' '}
+                    <Text
+                      style={{fontSize: 16, fontFamily: 'sans-serif-regular'}}>
+                      {item.desc}
+                    </Text>
                   </Text>
-                </Text>
-                <Divider
-                  style={{backgroundColor: 'rgba(0,0,0,0.25)', marginTop: 15}}
-                />
-              </TouchableOpacity>
+                </TouchableOpacity>
+              </View>
             )}
             ListEmptyComponent={
               <View
                 style={{
                   flex: 1,
                   justifyContent: 'center',
+                  marginHorizontal: 15,
                 }}>
                 <Image
                   source={placeHolderImg}
@@ -294,3 +385,7 @@ export default class DashboardScreen extends Component {
 }
 
 const styles = StyleSheet.create({});
+
+export default connect(null, {
+  setLocationAction,
+})(DashboardScreen);

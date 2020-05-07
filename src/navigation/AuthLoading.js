@@ -12,7 +12,10 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 const splash = require('../assets/images/splash.jpeg');
-export default class AuthLoading extends React.Component {
+import {connect} from 'react-redux';
+import {setUserDetailsAction} from '../redux/actions';
+
+class AuthLoading extends React.Component {
   state = {
     isLoading: true,
   };
@@ -24,12 +27,15 @@ export default class AuthLoading extends React.Component {
   // Fetch the token from storage then navigate to our appropriate place
   _bootstrapAsync = async props => {
     // const user = await AsyncStorage.removeItem('user_id');
-    const user = await AsyncStorage.getItem('user_id');
+    const user_id = await AsyncStorage.getItem('user_id');
 
-    console.log(user);
+    console.log(user_id, 'user is in authloading');
 
     // this.props.navigation.navigate('Auth');
-    if (user) {
+    if (user_id) {
+      this.props.setUserDetailsAction({
+        user_id: JSON.parse(user_id),
+      });
       this.props.navigation.navigate('App');
     } else {
       this.props.navigation.navigate('Auth');
@@ -57,3 +63,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
 });
+
+export default connect(
+  null,
+  {
+    setUserDetailsAction,
+  },
+)(AuthLoading);
