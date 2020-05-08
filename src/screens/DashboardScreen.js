@@ -309,11 +309,13 @@ class DashboardScreen extends Component {
             renderItem={({item}) => (
               <View
                 style={{
-                  elevation: 5,
+                  elevation: 7,
                   marginBottom: 15,
                   backgroundColor: 'white',
                   marginHorizontal: 15,
                   borderRadius: 4,
+                  marginTop: 10,
+                  overflow: 'hidden',
                 }}>
                 <TouchableOpacity
                   activeOpacity={0.8}

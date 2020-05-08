@@ -8,46 +8,52 @@ import Colors from '../constants/Colors';
 import AsyncStorage from '@react-native-community/async-storage';
 import OutgoingRequestsTabScreen from './OutgoingRequestsTabScreen';
 import IncomingRequestsTabScreen from './IncomingRequestsTabScreen';
+import {connect} from 'react-redux';
+import {getRequestListAction} from '../redux/actions';
+
 class RequestListScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
       data: null,
       index: 0,
-      routes: [{key: 'first', title: 'tab 1'}, {key: 'second', title: 'tab 2'}],
+      routes: [
+        {key: 'first', title: 'Own Requests'},
+        {key: 'second', title: 'Sent Requests'},
+      ],
     };
   }
 
   componentDidMount = () => {
-    this.getRequestList();
+    this.props.getRequestListAction();
   };
 
-  getRequestList = async () => {
-    try {
-      this.setState({
-        loading: true,
-      });
-      let userId = await AsyncStorage.getItem('user_id');
+  // getRequestList = async () => {
+  //   try {
+  //     this.setState({
+  //       loading: true,
+  //     });
+  //     let userId = await AsyncStorage.getItem('user_id');
 
-      let resData = await universalApiCall('/listpointlocationbyuser', 'POST', {
-        user_id: JSON.parse(userId),
-      });
+  //     let resData = await universalApiCall('/listpointlocationbyuser', 'POST', {
+  //       user_id: JSON.parse(userId),
+  //     });
 
-      if (resData.data.status) {
-        this.setState({
-          loading: false,
-          data: resData.data.result,
-        });
-      }
+  //     if (resData.data.status) {
+  //       this.setState({
+  //         loading: false,
+  //         data: resData.data.result,
+  //       });
+  //     }
 
-      console.log(resData);
-    } catch (error) {
-      this.setState({
-        loading: false,
-      });
-      console.log(error, 'in dashboard get data');
-    }
-  };
+  //     console.log(resData);
+  //   } catch (error) {
+  //     this.setState({
+  //       loading: false,
+  //     });
+  //     console.log(error, 'in dashboard get data');
+  //   }
+  // };
 
   render() {
     return (
@@ -109,5 +115,13 @@ class RequestListScreen extends Component {
     );
   }
 }
+
 const styles = StyleSheet.create({});
-export default RequestListScreen;
+
+const mapStateToProps = state => ({
+  // requestListReducer: state.requestListReducer,
+});
+
+export default connect(mapStateToProps, {getRequestListAction})(
+  RequestListScreen,
+);

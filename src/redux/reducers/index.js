@@ -19,6 +19,7 @@ import activeProductTabReducer from './activeProductTabReducer';
 
 import allOrdersReducer from './allOrdersReducer';
 import SpecificOrderDetailsReducer from './SpecificOrderDetailsReducer';
+import requestListReducer from './requestListReducer';
 // Root Reducer
 const rootReducer = combineReducers({
   checkNetworkReducer,
@@ -39,6 +40,7 @@ const rootReducer = combineReducers({
   // allOrdersReducer,
   // SpecificOrderDetailsReducer,
   // activeProductTabReducer,
+  requestListReducer,
 });
 
 // console.log({rootReducer});

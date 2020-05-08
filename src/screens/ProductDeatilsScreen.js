@@ -81,6 +81,16 @@ class ProductDeatilsScreen extends Component {
     );
     // console.log(product_id, JSON.parse(user_id), 'product id, user id');
     // console.log('moment', moment().format('YYYY-MM-DD HH:MM:SS'));
+
+    // this.map.current._component.animateToCoordinate(
+    //   {
+    //     latitude: 28.869236999,
+    //     longitude: -81.234822999,
+    //   },
+    //   2,
+    // );
+
+    console.log(this.map);
   };
 
   getDistanceMeter = region => {
@@ -392,7 +402,7 @@ class ProductDeatilsScreen extends Component {
   }
 
   render() {
-    console.log('state', this.state.distance);
+    console.log('state', this.state);
     // this.getDistanceMeter();
 
     return (
@@ -555,7 +565,7 @@ class ProductDeatilsScreen extends Component {
                 />
               </View>
             </View>
-          ) : (
+          ) : !this.state.loading ? (
             <View
               style={{
                 paddingHorizontal: 15,
@@ -569,7 +579,7 @@ class ProductDeatilsScreen extends Component {
                 You're not within 100 meter radius from the product
               </Text>
             </View>
-          )}
+          ) : null}
           {!this.state.loading ? (
             <View
               style={{
@@ -608,10 +618,30 @@ class ProductDeatilsScreen extends Component {
                       height: 250,
                       width: '100%',
                     }}
+                    // onLayout={() => {
+                    //   this.map.current.fitToCoordinates(
+                    //     {
+                    //       latitude: JSON.parse(this.state.productData.lat),
+                    //       longitude: JSON.parse(this.state.productData.lon),
+                    //     },
+                    //     {
+                    //       edgePadding: {
+                    //         top: 50,
+                    //         right: 50,
+                    //         bottom: 50,
+                    //         left: 50,
+                    //       },
+                    //       animated: true,
+                    //     },
+                    //   );
+                    // }}
                     initialRegion={initialRegion}
                     region={this.state.region}>
                     <Marker
-                      coordinate={this.state.region}
+                      coordinate={{
+                        latitude: JSON.parse(this.state.productData.lat),
+                        longitude: JSON.parse(this.state.productData.lon),
+                      }}
                       title="Tree location"
                     />
                   </MapView>

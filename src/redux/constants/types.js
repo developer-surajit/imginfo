@@ -51,3 +51,7 @@ export const ADD_NOT_LISTED_PRODUCT = 'ADD_NOT_LISTED_PRODUCT';
 export const SET_ACTIVE_PRODUCT_TAB = 'SET_ACTIVE_PRODUCT_TAB';
 export const CANCEL_CURRENT_ORDER = 'CANCEL_CURRENT_ORDER';
 export const SEND_COMMENT = 'SEND_COMMENT';
+
+// ==================================
+
+export const GET_REQUEST_LIST = 'GET_REQUEST_LIST';
