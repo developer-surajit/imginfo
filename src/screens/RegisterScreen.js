@@ -20,7 +20,9 @@ const deviceWidth = Dimensions.get('window').width;
 import {universalApiCall} from './../utils/universalApiCall';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Colors from '../constants/Colors';
-export default class RegisterScreen extends Component {
+import networkCheck from '../utils/networkCheck';
+import {connect} from 'react-redux';
+class RegisterScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -55,6 +57,7 @@ export default class RegisterScreen extends Component {
 
   registerUser = async values => {
     try {
+      if (networkCheck(this.props.checkNetworkReducer)) return;
       this.setState({
         loading: true,
       });
@@ -271,3 +274,9 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
 });
+
+const mapStateToProps = state => ({
+  checkNetworkReducer: state.checkNetworkReducer,
+});
+
+export default connect(mapStateToProps)(RegisterScreen);

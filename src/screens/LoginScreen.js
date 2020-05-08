@@ -22,6 +22,8 @@ const logo = require('./../assets/images/Logo.jpg');
 import Colors from '../constants/Colors';
 import {connect} from 'react-redux';
 import {setUserDetailsAction} from '../redux/actions';
+import networkCheck from '../utils/networkCheck';
+
 class LoginScreen extends Component {
   constructor(props) {
     super(props);
@@ -43,6 +45,7 @@ class LoginScreen extends Component {
 
   loginUser = async values => {
     try {
+      if (networkCheck(this.props.checkNetworkReducer)) return;
       this.setState({
         loading: true,
       });
@@ -68,7 +71,7 @@ class LoginScreen extends Component {
       this.setState({
         loading: false,
       });
-      alert('Sorry, Please enter valid login creadentials ');
+      ToastAndroid.show('Sorry, Please enter valid login creadentials', 1000);
       console.log(error.response);
     }
   };
@@ -262,9 +265,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default connect(
-  null,
-  {
-    setUserDetailsAction,
-  },
-)(LoginScreen);
+const mapStateToProps = state => ({
+  checkNetworkReducer: state.checkNetworkReducer,
+});
+
+export default connect(mapStateToProps, {setUserDetailsAction})(LoginScreen);

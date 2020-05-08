@@ -83,9 +83,6 @@ export default class AppHeader extends Component {
               <MenuOption onSelect={() => alert(`Not implemented`)}>
                 <Text style={styles.optionsTitle}>Change Language</Text>
               </MenuOption>
-              <MenuOption onSelect={() => alert(`Not implemented`)}>
-                <Text style={styles.optionsTitle}>Settings</Text>
-              </MenuOption>
               <MenuOption
                 onSelect={() =>
                   NavigationService.navigate('RequestListScreen')

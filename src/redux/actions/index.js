@@ -4,3 +4,4 @@ export * from './checkNetworkAction';
 export * from './setUserDetailsAction';
 export * from './removeUserProfileDetailsAction';
 export * from './setCurrentStoreAction';
+export * from './getProductListAction';

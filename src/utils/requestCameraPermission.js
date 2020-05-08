@@ -112,7 +112,7 @@ const requestCameraPermission = () => {
         })
         .catch(error => {
           console.log('error in catch permission camera');
-          return rej(error);
+          return rej({type: 'error_CameraStorage_permission', error});
         });
     }
   });

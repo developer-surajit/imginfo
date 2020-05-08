@@ -27,9 +27,11 @@ const placeHolderImg = require('./../assets/images/placeholder-1.jpg');
 import requestGpsPermission from '../utils/requestGpsPermission';
 import enableGpsAndroid from '../utils/enableGpsAndroid';
 import getUserLocation from '../utils/getUserLocation';
+import Geolocation from '@react-native-community/geolocation';
 // import {SET_LOCATION} from '../constants/types';
-import {setLocationAction} from '../redux/actions';
+import {setLocationAction, getProductListAction} from '../redux/actions';
 import {connect} from 'react-redux';
+import networkCheck from '../utils/networkCheck';
 
 let DATA = [
   {
@@ -60,17 +62,63 @@ let DATA = [
 
 class DashboardScreen extends Component {
   state = {
-    loading: true,
+    loading: !true,
     imgData: [],
     rangeLow: null,
     rangeHigh: null,
     range: 50,
   };
 
+  watchID = null;
+
   componentDidMount = () => {
     this.askPermissionAndGetLocation();
   };
 
+  watchUserLocation = () => {
+    // Geolocation.getCurrentPosition(
+    //   position => {
+    //     let userLocation = {
+    //       userLocation: {
+    //         latitudeDelta: 0.0922,
+    //         longitudeDelta: 0.0421,
+    //         latitude: position.coords.latitude,
+    //         longitude: position.coords.longitude,
+    //       },
+    //     };
+    //     this.props.setLocationAction(userLocation);
+    //   },
+    //   error => alert(error.message),
+    //   {enableHighAccuracy: false, timeout: 20000, maximumAge: 1000},
+    // );
+    this.watchID = Geolocation.watchPosition(
+      position => {
+        let userLocation = {
+          userLocation: {
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          },
+        };
+        this.props.setLocationAction(userLocation);
+        // console.log({userLocation});
+      },
+      error => console.log(JSON.stringify(error.message)),
+      {
+        enableHighAccuracy: false,
+        timeout: 20000,
+        maximumAge: 0,
+        distanceFilter: 50,
+      },
+    );
+
+    console.log(this.watchID, 'watch id');
+  };
+
+  componentWillUnmount = () => {
+    Geolocation.clearWatch(this.watchID);
+  };
   askPermissionAndGetLocation = async () => {
     try {
       let checkGpsPermission = await requestGpsPermission();
@@ -82,42 +130,11 @@ class DashboardScreen extends Component {
           if (enableGps == 'enabled' || enableGps == 'already-enabled') {
             // then ask user's location
             let userLocation = await getUserLocation();
-            if (userLocation.mocked) {
-              // Alert.alert(
-              //   'Mocked Location',
-              //   `Please turn off mocked location and try again.`,
-              //   [
-              //     {
-              //       text: 'Try again',
-              //       onPress: () => this.askPermissionAndGetLocation(),
-              //     },
-              //     {
-              //       text: 'Exit App',
-              //       onPress: () => BackHandler.exitApp(),
-              //       style: 'cancel',
-              //     },
-              //   ],
-              // );
-              this.props.setLocationAction(userLocation);
-              this.setState(
-                {
-                  userLocation: userLocation.userLocation,
-                },
-                () => this.getPhotoList(),
-              );
-            } else {
-              this.props.setLocationAction(userLocation);
-              this.setState(
-                {
-                  userLocation: userLocation.userLocation,
-                },
-                () => this.getPhotoList(),
-              );
-            }
+            this.props.setLocationAction(userLocation);
+            this.searchProduct();
+            this.watchUserLocation();
           }
         }
-
-        // this.getLocation();
       }
     } catch (error) {
       console.log(error, 'askPermissionAndGetLocation');
@@ -172,45 +189,53 @@ class DashboardScreen extends Component {
     }
   };
 
-  getPhotoList = async () => {
-    try {
-      this.setState({
-        loading: true,
+  searchProduct = () => {
+    if (this.props.userLocationReducer.userLocation) {
+      this.props.getProductListAction({
+        redius: this.state.range,
+        lat: this.props.userLocationReducer.userLocation.latitude,
+        lon: this.props.userLocationReducer.userLocation.longitude,
       });
-      let userId = await AsyncStorage.getItem('user_id');
-
-      let data = await universalApiCall(
-        '/listpointlocationbyuserandredius',
-        'POST',
-        {
-          // user_id: JSON.parse(userId),
-          redius: this.state.range,
-          // lat: 23.3097715,
-          // lon: 87.3766212,
-          lat: this.state.userLocation.latitude,
-          lon: this.state.userLocation.longitude,
-        },
-      );
-
-      if (data.data.status) {
-        this.setState({
-          imgData: data.data.result,
-        });
-      }
-
-      this.setState({
-        loading: false,
-      });
-
-      console.log(data, 'search by radius');
-    } catch (error) {
-      this.setState({
-        loading: false,
-      });
-      ToastAndroid.show('Something is wrong, try again', 1000);
-      console.log(error, error.response, 'in dashboard get data');
     }
   };
+
+  // getPhotoList = async () => {
+  //   try {
+  //     if (networkCheck(this.props.checkNetworkReducer)) return;
+
+  //     this.setState({
+  //       loading: true,
+  //     });
+
+  //     let data = await universalApiCall(
+  //       '/listpointlocationbyuserandredius',
+  //       'POST',
+  //       {
+  //         redius: this.state.range,
+  //         lat: this.props.userLocationReducer.userLocation.latitude,
+  //         lon: this.props.userLocationReducer.userLocation.longitude,
+  //       },
+  //     );
+
+  //     if (data.data.status) {
+  //       this.setState({
+  //         imgData: data.data.result,
+  //       });
+  //     }
+
+  //     this.setState({
+  //       loading: false,
+  //     });
+
+  //     console.log(data, 'search by radius');
+  //   } catch (error) {
+  //     this.setState({
+  //       loading: false,
+  //     });
+  //     ToastAndroid.show('Something is wrong, try again', 1000);
+  //     console.log(error, error.response, 'in dashboard get data');
+  //   }
+  // };
 
   render() {
     return (
@@ -236,7 +261,7 @@ class DashboardScreen extends Component {
             maximumTrackTintColor="#000000"
             onSlidingComplete={range => {
               console.log(range);
-              this.setState({range}, () => this.askPermissionAndGetLocation());
+              this.setState({range}, () => this.searchProduct());
             }}
           />
         </View>
@@ -262,7 +287,7 @@ class DashboardScreen extends Component {
         ) : null}
         <Spinner
           textContent="Loading.."
-          visible={this.state.loading}
+          visible={this.props.spinner}
           overlayColor="rgba(0,0,0,0.5)"
           textStyle={{color: 'white'}}
         />
@@ -279,7 +304,8 @@ class DashboardScreen extends Component {
           }}>
           <FlatList
             // data={DATA}
-            data={this.state.imgData}
+            // data={this.state.imgData}
+            data={this.props.productListReducer.productList}
             renderItem={({item}) => (
               <View
                 style={{
@@ -386,6 +412,14 @@ class DashboardScreen extends Component {
 
 const styles = StyleSheet.create({});
 
-export default connect(null, {
+const mapStateToProps = state => ({
+  userLocationReducer: state.userLocationReducer,
+  checkNetworkReducer: state.checkNetworkReducer,
+  productListReducer: state.productListReducer,
+  spinner: state.spinnerToggleReducers.spinner,
+});
+
+export default connect(mapStateToProps, {
   setLocationAction,
+  getProductListAction,
 })(DashboardScreen);

@@ -10,6 +10,7 @@ import {
   ToastAndroid,
   Alert,
   Platform,
+  Linking,
 } from 'react-native';
 import ImageSlider from 'react-native-image-slider';
 import getDirections from 'react-native-google-maps-directions';
@@ -29,7 +30,10 @@ import {connect} from 'react-redux';
 const placeHolderImg = require('./../assets/images/placeholder-1.jpg');
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = 0.0421;
-
+import {convertDistance, getDistance} from 'geolib';
+const WIDTH = Dimensions.get('window').width;
+const HEIGHT = Dimensions.get('window').height;
+import Carousel, {Pagination} from 'react-native-snap-carousel';
 const initialRegion = {
   latitude: -37.78825,
   longitude: -122.4324,
@@ -56,9 +60,12 @@ class ProductDeatilsScreen extends Component {
       ready: true,
       rating: 0,
       imageArray: [],
+      activeIndex: 0,
+      distance: null,
     };
 
     this.map = React.createRef();
+    this.c = React.createRef();
   }
 
   componentDidMount = async () => {
@@ -74,6 +81,17 @@ class ProductDeatilsScreen extends Component {
     );
     // console.log(product_id, JSON.parse(user_id), 'product id, user id');
     // console.log('moment', moment().format('YYYY-MM-DD HH:MM:SS'));
+  };
+
+  getDistanceMeter = region => {
+    return getDistance(this.props.userLocation, region);
+    // console.log(
+    //   geolib.convertDistance(
+    //     getDistance(this.props.userLocation, region || this.state.region),
+    //   ),
+    //   'km',
+    // );
+    // console.log(convertDistance(1000), 'm');
   };
 
   getProductDetails = async () => {
@@ -97,7 +115,9 @@ class ProductDeatilsScreen extends Component {
           latitudeDelta: LATITUDE_DELTA,
           longitudeDelta: LONGITUDE_DELTA,
         };
+
         this.setState({
+          distance: this.getDistanceMeter(region),
           loading: false,
           productData: data.data.result[0],
           region: region,
@@ -157,8 +177,43 @@ class ProductDeatilsScreen extends Component {
     getDirections(data);
   };
 
-  requestOwner = () => {
-    console.log(this.state, 'state');
+  requestOwner = async () => {
+    console.log(this.state, 'dddddddd');
+    try {
+      let {user_id, product_id} = this.state;
+
+      let dateTime = `${moment().format('YYYY-MM-DD')} ${moment().format(
+        'HH:MM:SS',
+      )}`;
+      console.log(dateTime, 'dateTime');
+      let submitData = {
+        user_id,
+        product_id,
+        date_time: dateTime,
+        status: 0,
+        transfer_status: 'Send',
+      };
+
+      let data = await universalApiCall(
+        '/addrequestbyuser',
+        'POST',
+        submitData,
+      );
+      console.log(data, 'request data');
+
+      if (data.data.status) {
+        // this.getProductDetails();
+        // this.setState({
+        //   loading: false,
+        // });
+        ToastAndroid.show('request successfully', 1500);
+      }
+    } catch (error) {
+      this.setState({
+        loading: false,
+      });
+      console.log(error, 'error in submit');
+    }
   };
 
   takePicture = () => {
@@ -239,6 +294,51 @@ class ProductDeatilsScreen extends Component {
       }
     } catch (error) {
       console.log(error);
+      if (error.type == 'error_CameraStorage_permission') {
+        Alert.alert('Error', 'Please check for permission and try again', [
+          {
+            text: 'Try again',
+            onPress: () => this.askPermissionAndTakeImage(),
+          },
+          {
+            text: 'Cancel',
+            // onPress: () => {
+            //   BackHandler.exitApp();
+            // },
+            style: 'cancel',
+          },
+        ]);
+      } else if (
+        error.type == 'unavailable' ||
+        error.type == 'denied' ||
+        error.type == 'blocked'
+      ) {
+        Alert.alert(
+          'Permission Denied',
+          'Please enable Storage and camera permission and try again',
+          [
+            {
+              text: 'Change permission',
+              onPress: () => this.openSettings(),
+            },
+            {
+              text: 'Cancel',
+              // onPress: () => {
+              //   BackHandler.exitApp();
+              // },
+              style: 'cancel',
+            },
+          ],
+        );
+      }
+    }
+  };
+
+  openSettings = async () => {
+    try {
+      await Linking.openSettings();
+    } catch (error) {
+      console.log('error in openSettings', error);
     }
   };
 
@@ -272,74 +372,100 @@ class ProductDeatilsScreen extends Component {
     }
   };
 
+  _renderItem({item, index}) {
+    return (
+      <View
+        style={{
+          elevation: 5,
+          marginHorizontal: 10,
+          marginVertical: 15,
+          borderRadius: 10,
+          backgroundColor: 'white',
+          overflow: 'hidden',
+        }}>
+        <Image
+          source={{uri: item}}
+          style={[{width: '100%', height: 300}, {resizeMode: 'cover'}]}
+        />
+      </View>
+    );
+  }
+
   render() {
-    // if (this.state.loading) {
-    //   return (
-    //     // <View>
-    //     //   <Text>Loading</Text>
-    //     // </View>
-    //     <Spinner
-    //       textContent="Loading.."
-    //       visible={this.state.loading}
-    //       overlayColor="rgba(0,0,0,0.5)"
-    //       textStyle={{color: 'white'}}
-    //     />
-    //   );
-    // }
-
-    // let property_type = 'public';
-    // average_rating;
-
-    // if (this.state.productData && !!!property_type) {
-    //   property_type = 'public';
-    // } else {
-    //   property_type = this.state.productData.property_type;
-    // }
-
-    // let images = [`https://iodroid.in/redfrugten/uploads/${product_image}`];
-
-    // multiple_image.array.forEach(element => {
-
-    // });
-
-    console.log('state', this.state);
+    console.log('state', this.state.distance);
+    // this.getDistanceMeter();
 
     return (
       <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
         <ScrollView>
           {!this.state.loading ? (
-            <View style={{flexBasis: 250}}>
-              <ImageSlider
-                loopBothSides
-                autoPlayWithInterval={3000}
-                images={this.state.imageArray}
-                customSlide={({index, item, style, width}) => (
-                  // It's important to put style here because it's got offset inside
-                  <View
-                    key={index}
-                    style={[style, styles.customSlide, styles.slider]}>
-                    <Image
-                      source={{uri: item}}
-                      style={[styles.customImage, {resizeMode: 'cover'}]}
-                    />
-                  </View>
-                )}
+            // <View style={{flexBasis: 250}}>
+            //   <ImageSlider
+            //     loopBothSides
+            //     autoPlayWithInterval={3000}
+            //     images={this.state.imageArray}
+            //     customSlide={({index, item, style, width}) => (
+            //       // It's important to put style here because it's got offset inside
+            //       <View
+            //         key={index}
+            //         style={[style, styles.customSlide, styles.slider]}>
+            //         <Image
+            //           source={{uri: item}}
+            //           style={[styles.customImage, {resizeMode: 'cover'}]}
+            //         />
+            //       </View>
+            //     )}
+            //   />
+            // </View>
+            <View style={{flex: 1}}>
+              <Carousel
+                layout={'default'}
+                layoutCardOffset={18}
+                ref={this.c}
+                data={this.state.imageArray}
+                sliderWidth={WIDTH}
+                itemWidth={WIDTH - 100}
+                renderItem={this._renderItem}
+                onSnapToItem={index => this.setState({activeIndex: index})}
               />
+              {/* <Pagination
+                carouselRef={this.c}
+                dotsLength={this.state.imageArray.length}
+                activeDotIndex={this.state.activeIndex}
+                containerStyle={{backgroundColor: 'white'}}
+                dotStyle={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: 5,
+                  marginHorizontal: 8,
+                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                }}
+                inactiveDotStyle={
+                  {
+                    // Define styles for inactive dots here
+                  }
+                }
+                inactiveDotOpacity={0.4}
+                inactiveDotScale={0.6}
+              /> */}
             </View>
           ) : (
             <View
               style={{
                 flex: 1,
                 justifyContent: 'center',
+                alignItems: 'center',
+                marginVertical: 15,
+                elevation: 5,
               }}>
               <Image
                 source={placeHolderImg}
                 resizeMode="contain"
                 style={{
-                  width: '100%',
-                  height: 250,
+                  width: WIDTH - 100,
+                  height: 300,
                   resizeMode: 'cover',
-                  borderRadius: 4,
+                  borderRadius: 10,
                 }}
               />
               {!this.state.loading ? (
@@ -360,29 +486,39 @@ class ProductDeatilsScreen extends Component {
             overlayColor="rgba(0,0,0,0.5)"
             textStyle={{color: 'white'}}
           />
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              paddingHorizontal: 15,
-              paddingVertical: 10,
-            }}>
-            <Icon
-              name="image-plus"
-              type="material-community"
-              color="#777"
-              onPress={this.askPermissionAndTakeImage}
-            />
+          {!this.state.loading &&
+          !isNaN(this.state.distance) &&
+          this.state.distance - 100 < 0 ? (
             <View
-              style={
-                {
-                  // flexDirection: 'row',
-                  // justifyContent: 'center',
-                  // alignItems: 'center',
-                }
-              }>
-              <Text
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                paddingHorizontal: 15,
+                paddingVertical: 15,
+                // borderBottomWidth: 1,
+                // borderTopWidth: 1,
+                // borderColor: Colors.light_grey,
+                backgroundColor: Colors.main_color,
+                elevation: 2,
+                marginHorizontal: 15,
+                borderRadius: 10,
+              }}>
+              <Icon
+                name="image-plus"
+                type="material-community"
+                color="white"
+                onPress={this.askPermissionAndTakeImage}
+              />
+              <View
+                style={
+                  {
+                    // flexDirection: 'row',
+                    // justifyContent: 'center',
+                    // alignItems: 'center',
+                  }
+                }>
+                {/* <Text
                 style={{
                   textAlign: 'right',
                   marginHorizontal: 5,
@@ -393,22 +529,63 @@ class ProductDeatilsScreen extends Component {
                 {this.state.productData && this.state.productData.rating
                   ? this.state.productData.rating
                   : '0'}
-              </Text>
-              <AirbnbRating
-                count={5}
-                defaultRating={this.state.rating}
-                size={20}
-                showRating={false}
-                onFinishRating={e => {
-                  this.submitRating(e);
-                }}
-              />
+              </Text> */}
+                <AirbnbRating
+                  count={5}
+                  defaultRating={this.state.rating}
+                  size={20}
+                  showRating={false}
+                  onFinishRating={e => {
+                    Alert.alert('Are you sure', 'You want to rate this item?', [
+                      {
+                        text: 'Yes',
+                        onPress: () => this.submitRating(e),
+                      },
+                      {
+                        text: 'Cancel',
+                        onPress: () => {
+                          console.log('cancel');
+                          this.setState({rating: 0});
+                        },
+                        style: 'cancel',
+                      },
+                    ]);
+                    // this.submitRating(e);
+                  }}
+                />
+              </View>
             </View>
-          </View>
+          ) : (
+            <View
+              style={{
+                paddingHorizontal: 15,
+                paddingVertical: 15,
+                backgroundColor: Colors.main_color_light_0,
+                elevation: 2,
+                marginHorizontal: 15,
+                borderRadius: 10,
+              }}>
+              <Text style={{color: Colors.dark_grey_2, textAlign: 'center'}}>
+                You're not within 100 meter radius from the product
+              </Text>
+            </View>
+          )}
           {!this.state.loading ? (
-            <View style={{marginTop: 10, paddingHorizontal: 15}}>
+            <View
+              style={{
+                marginTop: 20,
+                marginHorizontal: 15,
+                backgroundColor: 'white',
+                elevation: 5,
+              }}>
               {!isEmpty(this.state.productData) ? (
-                <Text>
+                <Text
+                  style={{
+                    textTransform: 'capitalize',
+                    fontSize: 16,
+                    textAlign: 'center',
+                    paddingVertical: 10,
+                  }}>
                   Property type :{' '}
                   {!isEmpty(this.state.productData)
                     ? this.state.productData.property_type
@@ -416,22 +593,41 @@ class ProductDeatilsScreen extends Component {
                 </Text>
               ) : null}
               {this.state.productData ? (
-                <MapView
-                  ref={this.map}
-                  style={{height: 200, width: '100%', marginTop: 10}}
-                  initialRegion={initialRegion}
-                  region={this.state.region}>
-                  <Marker
-                    coordinate={this.state.region}
-                    title="Tree location"
-                  />
-                </MapView>
+                <View
+                  style={
+                    {
+                      // borderRadius: 5,
+                      // overflow: 'hidden',
+                      // marginTop: 10,
+                      // marginBottom: 20,
+                    }
+                  }>
+                  <MapView
+                    ref={this.map}
+                    style={{
+                      height: 250,
+                      width: '100%',
+                    }}
+                    initialRegion={initialRegion}
+                    region={this.state.region}>
+                    <Marker
+                      coordinate={this.state.region}
+                      title="Tree location"
+                    />
+                  </MapView>
+                </View>
               ) : null}
             </View>
           ) : (
-            <View>
+            <View
+              style={{
+                marginTop: 20,
+                marginHorizontal: 15,
+                backgroundColor: 'white',
+                elevation: 5,
+              }}>
               <MapView
-                style={{height: 200, width: '100%', marginTop: 10}}
+                style={{height: 250, width: '100%'}}
                 initialRegion={this.props.userLocation}
               />
             </View>
@@ -448,7 +644,7 @@ class ProductDeatilsScreen extends Component {
                     : 'center',
                 alignItems: 'center',
                 paddingHorizontal: 15,
-                paddingVertical: 10,
+                marginVertical: 20,
               }}>
               <Button
                 buttonStyle={styles.btnStyle}
@@ -581,7 +777,7 @@ const styles = StyleSheet.create({
   },
   customImage: {
     width: '100%',
-    height: Dimensions.get('window').width,
+    height: 300,
   },
 });
 
