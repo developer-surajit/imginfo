@@ -22,6 +22,9 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import Colors from '../constants/Colors';
 import networkCheck from '../utils/networkCheck';
 import {connect} from 'react-redux';
+
+import {toastAndroidiOS} from '../utils/toastAndroidiOS';
+
 class RegisterScreen extends Component {
   constructor(props) {
     super(props);
@@ -69,20 +72,26 @@ class RegisterScreen extends Component {
         otp_verified: 1,
       });
 
-      if (register.data.status) {
-        this.setState({
-          loading: false,
-        });
-        alert('User created successfully');
-        this.props.navigation.goBack();
-      }
-      console.log(register);
-      console.log(values);
-    } catch (error) {
       this.setState({
         loading: false,
       });
-      alert('Something went wrong, please try again');
+      if (register.data.status) {
+        toastAndroidiOS('User created successfully', 2000);
+        this.props.navigation.goBack();
+      } else {
+        toastAndroidiOS('User created failed, please try again', 2000);
+      }
+
+      console.log('register response', register);
+      console.log({values});
+    } catch (error) {
+      this.setState(
+        {
+          loading: false,
+        },
+        () => toastAndroidiOS('Something went wrong, please try again', 2000),
+      );
+
       console.log(error.response);
     }
   };

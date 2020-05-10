@@ -8,7 +8,6 @@ import {
   Image,
   Dimensions,
   FlatList,
-  ToastAndroid,
   TouchableOpacity,
   Platform,
   BackHandler,
@@ -199,44 +198,6 @@ class DashboardScreen extends Component {
     }
   };
 
-  // getPhotoList = async () => {
-  //   try {
-  //     if (networkCheck(this.props.checkNetworkReducer)) return;
-
-  //     this.setState({
-  //       loading: true,
-  //     });
-
-  //     let data = await universalApiCall(
-  //       '/listpointlocationbyuserandredius',
-  //       'POST',
-  //       {
-  //         redius: this.state.range,
-  //         lat: this.props.userLocationReducer.userLocation.latitude,
-  //         lon: this.props.userLocationReducer.userLocation.longitude,
-  //       },
-  //     );
-
-  //     if (data.data.status) {
-  //       this.setState({
-  //         imgData: data.data.result,
-  //       });
-  //     }
-
-  //     this.setState({
-  //       loading: false,
-  //     });
-
-  //     console.log(data, 'search by radius');
-  //   } catch (error) {
-  //     this.setState({
-  //       loading: false,
-  //     });
-  //     ToastAndroid.show('Something is wrong, try again', 1000);
-  //     console.log(error, error.response, 'in dashboard get data');
-  //   }
-  // };
-
   render() {
     return (
       <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
@@ -323,6 +284,7 @@ class DashboardScreen extends Component {
                   onPress={() =>
                     this.props.navigation.navigate('ProductDeatilsScreen', {
                       product_id: item.product_id,
+                      product_owner_id: item.user_id,
                     })
                   }>
                   <Image

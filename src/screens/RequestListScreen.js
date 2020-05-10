@@ -9,7 +9,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import OutgoingRequestsTabScreen from './OutgoingRequestsTabScreen';
 import IncomingRequestsTabScreen from './IncomingRequestsTabScreen';
 import {connect} from 'react-redux';
-import {getRequestListAction} from '../redux/actions';
+import {getRequestListAction, getSentRequestListAction} from '../redux/actions';
 
 class RequestListScreen extends Component {
   constructor(props) {
@@ -26,6 +26,7 @@ class RequestListScreen extends Component {
 
   componentDidMount = () => {
     this.props.getRequestListAction();
+    this.props.getSentRequestListAction();
   };
 
   // getRequestList = async () => {
@@ -122,6 +123,7 @@ const mapStateToProps = state => ({
   // requestListReducer: state.requestListReducer,
 });
 
-export default connect(mapStateToProps, {getRequestListAction})(
-  RequestListScreen,
-);
+export default connect(mapStateToProps, {
+  getRequestListAction,
+  getSentRequestListAction,
+})(RequestListScreen);

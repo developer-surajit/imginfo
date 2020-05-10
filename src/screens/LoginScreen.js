@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Dimensions,
-  ToastAndroid,
   Image,
 } from 'react-native';
 import {Button, Input} from 'react-native-elements';
@@ -23,6 +22,9 @@ import Colors from '../constants/Colors';
 import {connect} from 'react-redux';
 import {setUserDetailsAction} from '../redux/actions';
 import networkCheck from '../utils/networkCheck';
+// import Toast from 'react-native-tiny-toast';
+
+import {toastAndroidiOS} from '../utils/toastAndroidiOS';
 
 class LoginScreen extends Component {
   constructor(props) {
@@ -56,10 +58,10 @@ class LoginScreen extends Component {
       });
 
       if (login.data.status) {
-        ToastAndroid.show('Login successfully', 1000);
+        toastAndroidiOS('Login successfully', 2000);
         this.saveDetails(login.data.result);
       } else {
-        ToastAndroid.show('Sorry, Please enter valid login creadentials', 1000);
+        toastAndroidiOS('Sorry, Please enter valid login creadentials', 2000);
       }
       this.setState({
         loading: false,
@@ -71,7 +73,7 @@ class LoginScreen extends Component {
       this.setState({
         loading: false,
       });
-      ToastAndroid.show('Sorry, Please enter valid login creadentials', 1000);
+      toastAndroidiOS('Sorry, Please enter valid login creadentials', 2000);
       console.log(error.response);
     }
   };

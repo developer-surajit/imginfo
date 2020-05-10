@@ -7,7 +7,6 @@ import {
   StyleSheet,
   SafeAreaView,
   Dimensions,
-  ToastAndroid,
   Alert,
   Platform,
   Linking,
@@ -16,7 +15,10 @@ import ImageSlider from 'react-native-image-slider';
 import getDirections from 'react-native-google-maps-directions';
 import {Rating, Icon, AirbnbRating, Button} from 'react-native-elements';
 import MapView, {Marker} from 'react-native-maps';
-import {ScrollView} from 'react-native-gesture-handler';
+import {
+  ScrollView,
+  TouchableWithoutFeedback,
+} from 'react-native-gesture-handler';
 import Colors from '../constants/Colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {universalApiCall} from '../utils/universalApiCall';
@@ -40,6 +42,9 @@ const initialRegion = {
   latitudeDelta: 0.0922,
   longitudeDelta: 0.0421,
 };
+
+import Toast from 'react-native-tiny-toast';
+import {toastAndroidiOS} from '../utils/toastAndroidiOS';
 
 class ProductDeatilsScreen extends Component {
   constructor(props) {
@@ -70,11 +75,13 @@ class ProductDeatilsScreen extends Component {
 
   componentDidMount = async () => {
     let product_id = this.props.navigation.getParam('product_id');
+    let product_owner_id = this.props.navigation.getParam('product_owner_id');
     let user_id = await AsyncStorage.getItem('user_id');
 
     this.setState(
       {
         product_id,
+        product_owner_id,
         user_id: JSON.parse(user_id),
       },
       () => this.getProductDetails(),
@@ -84,8 +91,8 @@ class ProductDeatilsScreen extends Component {
 
     // this.map.current._component.animateToCoordinate(
     //   {
-    //     latitude: 28.869236999,
-    //     longitude: -81.234822999,
+    // latitude: 28.869236999,
+    // longitude: -81.234822999,
     //   },
     //   2,
     // );
@@ -93,15 +100,22 @@ class ProductDeatilsScreen extends Component {
     console.log(this.map);
   };
 
+  componentDidUpdate = (prevProps, prevState) => {
+    if (
+      this.state.productData &&
+      prevProps.userLocation.latitude != this.props.userLocation.latitude
+    ) {
+      this.setState({
+        distance: this.getDistanceMeter({
+          latitude: JSON.parse(this.state.productData.lat),
+          longitude: JSON.parse(this.state.productData.lon),
+        }),
+      });
+    }
+  };
+
   getDistanceMeter = region => {
     return getDistance(this.props.userLocation, region);
-    // console.log(
-    //   geolib.convertDistance(
-    //     getDistance(this.props.userLocation, region || this.state.region),
-    //   ),
-    //   'km',
-    // );
-    // console.log(convertDistance(1000), 'm');
   };
 
   getProductDetails = async () => {
@@ -190,15 +204,23 @@ class ProductDeatilsScreen extends Component {
   requestOwner = async () => {
     console.log(this.state, 'dddddddd');
     try {
-      let {user_id, product_id} = this.state;
-
-      let dateTime = `${moment().format('YYYY-MM-DD')} ${moment().format(
-        'HH:MM:SS',
-      )}`;
-      console.log(dateTime, 'dateTime');
-      let submitData = {
+      const toast = Toast.showLoading('Loading...');
+      let {
         user_id,
         product_id,
+        product_owner_id,
+        requestDate,
+        requestTime,
+      } = this.state;
+
+      let dateTime = `${moment(requestDate).format('YYYY-MM-DD')} ${moment(
+        requestTime,
+      ).format('HH:MM:SS')}`;
+      console.log(dateTime, 'dateTime');
+      let submitData = {
+        sender_user_id: user_id,
+        product_id: product_id,
+        reciever_user_id: product_owner_id,
         date_time: dateTime,
         status: 0,
         transfer_status: 'Send',
@@ -210,15 +232,17 @@ class ProductDeatilsScreen extends Component {
         submitData,
       );
       console.log(data, 'request data');
-
+      Toast.hide(toast);
       if (data.data.status) {
         // this.getProductDetails();
         // this.setState({
         //   loading: false,
         // });
-        ToastAndroid.show('request successfully', 1500);
+        toastAndroidiOS('Request submitted successfully', 1500);
       }
     } catch (error) {
+      Toast.hide(toast);
+      toastAndroidiOS('Something went wrong, Please try again', 1500);
       this.setState({
         loading: false,
       });
@@ -250,10 +274,11 @@ class ProductDeatilsScreen extends Component {
     try {
       let {user_id, product_id} = this.state;
       this.setState({
-        loading: true,
+        // loading: true,
         imageUploading: true,
         uploadImageSuccessful: false,
       });
+      const imageToast = Toast.showLoading('Uploading...');
       let submitData = new FormData();
 
       const imgExtention = name.split('.').pop();
@@ -280,18 +305,38 @@ class ProductDeatilsScreen extends Component {
       );
 
       if (data.data.status) {
-        this.getProductDetails();
-        // this.setState({
-        //   loading: false,
-        // });
-        ToastAndroid.show('Image uploaded successfully', 1500);
+        // this.getProductDetails();
+        // toastAndroidiOS('Image uploaded successfully', 1500);
+        this.setState({
+          imageArray: [
+            ...this.state.imageArray,
+            `https://iodroid.in/redfrugten/uploads/${data.data.result.image}`,
+          ],
+        });
+        Alert.alert('Success', 'Image has been successfully uploaded', [
+          {
+            text: 'Close',
+            style: 'cancel',
+          },
+        ]);
+      } else {
+        Alert.alert('Failed', 'Image uploaded failed, Please try again', [
+          {
+            text: 'Close',
+            style: 'cancel',
+          },
+        ]);
       }
-
+      Toast.hide(imageToast);
       console.log(data, 'submit data');
     } catch (error) {
-      this.setState({
-        loading: false,
-      });
+      Alert.alert('Failed', 'Image uploaded failed, Please try again', [
+        {
+          text: 'Close',
+          style: 'cancel',
+        },
+      ]);
+      Toast.hide(imageToast);
       console.log(error, 'error in submit');
     }
   };
@@ -370,7 +415,7 @@ class ProductDeatilsScreen extends Component {
       // });
 
       if (data.data.status) {
-        ToastAndroid.show('Your rating is successful!!', 1500);
+        toastAndroidiOS('Your rating is successful!!', 1500);
       }
 
       console.log(data, 'rating');
@@ -402,7 +447,7 @@ class ProductDeatilsScreen extends Component {
   }
 
   render() {
-    console.log('state', this.state);
+    console.log('state image array', this.state.imageArray);
     // this.getDistanceMeter();
 
     return (
@@ -519,6 +564,7 @@ class ProductDeatilsScreen extends Component {
                 type="material-community"
                 color="white"
                 onPress={this.askPermissionAndTakeImage}
+                underlayColor={Colors.main_color}
               />
               <View
                 style={
@@ -546,21 +592,21 @@ class ProductDeatilsScreen extends Component {
                   size={20}
                   showRating={false}
                   onFinishRating={e => {
-                    Alert.alert('Are you sure', 'You want to rate this item?', [
-                      {
-                        text: 'Yes',
-                        onPress: () => this.submitRating(e),
-                      },
-                      {
-                        text: 'Cancel',
-                        onPress: () => {
-                          console.log('cancel');
-                          this.setState({rating: 0});
-                        },
-                        style: 'cancel',
-                      },
-                    ]);
-                    // this.submitRating(e);
+                    // Alert.alert('Are you sure', 'You want to rate this item?', [
+                    //   {
+                    //     text: 'Yes',
+                    //     onPress: () => this.submitRating(e),
+                    //   },
+                    //   {
+                    //     text: 'Cancel',
+                    //     onPress: () => {
+                    //       console.log('cancel');
+                    //       this.setState({rating: 0});
+                    //     },
+                    //     style: 'cancel',
+                    //   },
+                    // ]);
+                    this.submitRating(e);
                   }}
                 />
               </View>
@@ -587,6 +633,8 @@ class ProductDeatilsScreen extends Component {
                 marginHorizontal: 15,
                 backgroundColor: 'white',
                 elevation: 5,
+                borderRadius: 8,
+                overflow: 'hidden',
               }}>
               {!isEmpty(this.state.productData) ? (
                 <Text
@@ -596,22 +644,47 @@ class ProductDeatilsScreen extends Component {
                     textAlign: 'center',
                     paddingVertical: 10,
                   }}>
-                  Property type :{' '}
-                  {!isEmpty(this.state.productData)
-                    ? this.state.productData.property_type
-                    : 'public'}
+                  {this.state.productData.property_type.toLowerCase() ==
+                  'private'
+                    ? 'Private Property'
+                    : 'Public Property'}
                 </Text>
               ) : null}
               {this.state.productData ? (
                 <View
-                  style={
-                    {
-                      // borderRadius: 5,
-                      // overflow: 'hidden',
-                      // marginTop: 10,
-                      // marginBottom: 20,
-                    }
-                  }>
+                  style={{
+                    // borderRadius: 5,
+                    // overflow: 'hidden',
+                    // marginTop: 10,
+                    // marginBottom: 20,
+                    position: 'relative',
+                  }}>
+                  {/* {!isEmpty(this.state.productData) ? (
+                    <Text
+                      style={{
+                        textTransform: 'capitalize',
+                        fontSize: 12,
+                        textAlign: 'center',
+                        paddingVertical: 10,
+                        position: 'absolute',
+                        zIndex: 10,
+                        // backgroundColor: Colors.main_color,
+                        borderRadius: 50,
+                        paddingHorizontal: 15,
+                        color: 'rgba(0,0,0,0.7)',
+                        right: 10,
+                        top: 10,
+                        borderWidth: 2,
+                        borderColor: 'rgba(0,0,0,0.7)',
+                        lineHeight: 16,
+                      }}>
+                      {this.state.productData.property_type.toLowerCase() ==
+                      'private'
+                        ? 'Private Property'
+                        : 'Public Property'}
+                    </Text>
+                  ) : null} */}
+
                   <MapView
                     ref={this.map}
                     style={{
@@ -655,6 +728,8 @@ class ProductDeatilsScreen extends Component {
                 marginHorizontal: 15,
                 backgroundColor: 'white',
                 elevation: 5,
+                borderRadius: 8,
+                overflow: 'hidden',
               }}>
               <MapView
                 style={{height: 250, width: '100%'}}

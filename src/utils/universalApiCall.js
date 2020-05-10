@@ -2,8 +2,8 @@ import {server} from '../config/keys';
 import axios from 'axios';
 
 export const universalApiCall = async (link, method, params, headers) => {
-  console.log('api called param', link, method, params, headers);
-  console.log('api called link', server + link);
+  // console.log('api called param', link, method, params, headers);
+  // console.log('api called link', server + link);
 
   return new Promise((resolve, reject) => {
     let requestParams = {

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, FlatList} from 'react-native';
+import {View, Text, StyleSheet, FlatList, Image} from 'react-native';
 import {connect} from 'react-redux';
 import moment from 'moment';
 
@@ -14,7 +14,7 @@ class OutgoingRequestsTabScreen extends Component {
     return (
       <View style={{paddingTop: 10}}>
         <FlatList
-          data={this.props.requestListReducer.request_list}
+          data={this.props.requestListReducer.sent_request_list}
           renderItem={({item}) => (
             <View
               style={{
@@ -22,34 +22,63 @@ class OutgoingRequestsTabScreen extends Component {
                 marginBottom: 15,
                 backgroundColor: 'white',
                 marginHorizontal: 15,
-                borderRadius: 4,
-                paddingVertical: 15,
-                paddingHorizontal: 20,
-                paddingTop: 20,
+                borderRadius: 6,
+                overflow: 'hidden',
                 marginTop: 5,
               }}>
-              <Text style={{textAlign: 'center', fontSize: 16, lineHeight: 25}}>
-                Hi, User name wants to visit your tree on{' '}
-                {moment(item.date_time).format('DD-MM-YY')} at{' '}
-                {moment().format('hh:mm a')}
-              </Text>
-              <View
+              <Image
+                source={{
+                  uri: `https://iodroid.in/redfrugten/uploads/${item.product_image}`,
+                }}
+                resizeMode="contain"
                 style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-evenly',
-                  alignItems: 'center',
-                  marginTop: 20,
-                }}>
-                <Button
-                  title="Allow"
-                  type="clear"
-                  onPress={console.log('ddd')}
-                />
-                <Button
-                  title="Deny"
-                  type="clear"
-                  onPress={console.log('ddd')}
-                />
+                  width: '100%',
+                  height: 200,
+                  resizeMode: 'cover',
+                }}
+              />
+              <View style={{paddingVertical: 10, paddingHorizontal: 15}}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontFamily: 'sans-serif-medium',
+                  }}>
+                  Visit Time :{' '}
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontFamily: 'sans-serif-regular',
+                      color: '#29d',
+                    }}>
+                    {moment(item.date_time).format('DD-MM-YY')} at{' '}
+                    {moment(item.date_time).format('hh:mm a')}
+                  </Text>
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontFamily: 'sans-serif-medium',
+                    marginTop: 5,
+                  }}>
+                  Status :{' '}
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontFamily: 'sans-serif-regular',
+                      color:
+                        item.status.toLowerCase() == 'unditermind'
+                          ? '#29d'
+                          : item.status.toLowerCase() == 'allow'
+                          ? '#008b00'
+                          : '#fa383e',
+                    }}>
+                    {item.status.toLowerCase() == 'unditermind'
+                      ? 'Not reponded'
+                      : item.status.toLowerCase() == 'allow'
+                      ? 'Request Accepted'
+                      : 'Request Rejected'}
+                  </Text>
+                </Text>
               </View>
             </View>
           )}
@@ -65,12 +94,13 @@ class OutgoingRequestsTabScreen extends Component {
                   fontSize: 16,
                   marginTop: 15,
                   paddingLeft: 5,
+                  textAlign: 'center',
                 }}>
-                No request found
+                {this.props.spinner ? '' : 'No request found'}
               </Text>
             </View>
           }
-          keyExtractor={(item, i) => item.date_time}
+          keyExtractor={(item, i) => item.request_id}
         />
       </View>
     );
@@ -79,6 +109,7 @@ class OutgoingRequestsTabScreen extends Component {
 const styles = StyleSheet.create({});
 const mapStateToProps = state => ({
   requestListReducer: state.requestListReducer,
+  spinner: state.spinnerToggleReducers.spinner,
 });
 
 export default connect(mapStateToProps, {})(OutgoingRequestsTabScreen);

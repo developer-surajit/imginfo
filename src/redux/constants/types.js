@@ -55,3 +55,5 @@ export const SEND_COMMENT = 'SEND_COMMENT';
 // ==================================
 
 export const GET_REQUEST_LIST = 'GET_REQUEST_LIST';
+export const CHANGE_STATUS = 'CHANGE_STATUS';
+export const GET_SENT_REQUEST_LIST = 'GET_SENT_REQUEST_LIST';

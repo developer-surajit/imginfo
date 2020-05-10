@@ -6,7 +6,6 @@ import {
   ImageBackground,
   StyleSheet,
   Platform,
-  ToastAndroid,
 } from 'react-native';
 import {Input, Button} from 'react-native-elements';
 import {ScrollView} from 'react-native-gesture-handler';
@@ -15,6 +14,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Colors from '../constants/Colors';
 import {StackActions, NavigationActions} from 'react-navigation';
+import {toastAndroidiOS} from '../utils/toastAndroidiOS';
 import RadioForm, {
   RadioButton,
   RadioButtonInput,
@@ -71,7 +71,7 @@ class DetailsSubmitScreen extends Component {
     try {
       let {userLocation, imgUrl, userId, comment, property_type} = this.state;
       if (!!!comment) {
-        ToastAndroid.show('Please enter comment', 1500);
+        toastAndroidiOS('Please enter comment', 1500);
         return;
       }
       this.setState({
@@ -111,7 +111,7 @@ class DetailsSubmitScreen extends Component {
         this.setState({
           loading: false,
         });
-        ToastAndroid.show('Image uploaded successfully', 1500);
+        toastAndroidiOS('Image uploaded successfully', 1500);
         const resetAction = StackActions.reset({
           index: 0,
           actions: [

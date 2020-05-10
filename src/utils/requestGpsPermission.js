@@ -16,23 +16,36 @@ const requestGpsPermission = async () => {
         .then(result => {
           switch (result) {
             case RESULTS.UNAVAILABLE:
-              console.log(
-                'This feature is not available (on this device / in this context)',
-              );
-              break;
+              // console.log(
+              //   'This feature is not available (on this device / in this context)',
+              // );
+              return rej({type: 'unavailable', permissionName: 'LOCATION'});
             case RESULTS.DENIED:
-              console.log(
-                'The permission has not been requested / is denied but requestable',
-              );
-              break;
+              // console.log(
+              //   'The permission has not been requested / is denied but requestable',
+              // );
+              request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE)
+                .then(requestRes => {
+                  switch (requestRes) {
+                    case RESULTS.DENIED:
+                      return rej({type: 'denied', permissionName: 'LOCATION'});
+                    case RESULTS.GRANTED:
+                      return res({type: 'granted', permissionName: 'LOCATION'});
+                    case RESULTS.BLOCKED:
+                      return rej({type: 'blocked', permissionName: 'LOCATION'});
+                  }
+                })
+                .catch(error => {
+                  console.log('error in catch permission LOCATION');
+                });
             case RESULTS.GRANTED:
-              console.log('The permission is granted');
-              break;
+              // console.log('The permission is granted');
+              return res({type: 'granted', permissionName: 'LOCATION'});
             case RESULTS.BLOCKED:
-              console.log(
-                'The permission is denied and not requestable anymore',
-              );
-              break;
+              // console.log(
+              //   'The permission is denied and not requestable anymore',
+              // );
+              return rej({type: 'blocked', permissionName: 'CAMERA'});
           }
         })
         .catch(error => {

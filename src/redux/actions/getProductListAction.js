@@ -1,8 +1,9 @@
 import {toogleSpinnerAction} from './toogleSpinnerAction';
 import {universalApiCall} from '../../utils/universalApiCall';
 import networkCheck from '../../utils/networkCheck';
-import {ToastAndroid} from 'react-native';
+
 import {SET_PRODUCT_LIST} from '../constants/types';
+import {toastAndroidiOS} from '../../utils/toastAndroidiOS';
 
 const getProductListAction = data => (dispatch, getState) => {
   if (networkCheck(getState().checkNetworkReducer)) return;
@@ -20,7 +21,7 @@ const getProductListAction = data => (dispatch, getState) => {
       dispatch(toogleSpinnerAction(false));
     })
     .catch(err => {
-      ToastAndroid.show(
+      toastAndroidiOS(
         'Something went wrong in getting category list, Please try again',
         1000,
       );
