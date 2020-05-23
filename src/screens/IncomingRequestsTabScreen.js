@@ -17,8 +17,8 @@ class IncomingRequestsTabScreen extends Component {
   }
 
   changeStatus = async (request_id, status) => {
+    const toast = Toast.showLoading('Loading...');
     try {
-      const toast = Toast.showLoading('Loading...');
       let data = await universalApiCall('/requestresult', 'POST', {
         requst_id: request_id,
         status: status,
@@ -58,7 +58,7 @@ class IncomingRequestsTabScreen extends Component {
               <Text style={{textAlign: 'center', fontSize: 16, lineHeight: 25}}>
                 Hi, {item.sender_user_name} wants to visit your tree on{' '}
                 {moment(item.date_time).format('DD-MM-YY')} at{' '}
-                {moment(item.date_time).format('hh:mm a')}
+                {moment(item.date_time).format('HH:mm a')}
               </Text>
               {item.status.toLowerCase() == 'unditermind' ? (
                 <View

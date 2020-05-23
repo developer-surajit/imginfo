@@ -28,9 +28,15 @@ import enableGpsAndroid from '../utils/enableGpsAndroid';
 import getUserLocation from '../utils/getUserLocation';
 import Geolocation from '@react-native-community/geolocation';
 // import {SET_LOCATION} from '../constants/types';
-import {setLocationAction, getProductListAction} from '../redux/actions';
+import {
+  setLocationAction,
+  getProductListAction,
+  toggleFavouriteProductAction,
+} from '../redux/actions';
 import {connect} from 'react-redux';
 import networkCheck from '../utils/networkCheck';
+
+import HeartIcon from 'react-native-vector-icons/FontAwesome';
 
 let DATA = [
   {
@@ -68,56 +74,66 @@ class DashboardScreen extends Component {
     range: 50,
   };
 
-  watchID = null;
+  // watchID = null;
 
   componentDidMount = () => {
     this.askPermissionAndGetLocation();
   };
 
-  watchUserLocation = () => {
-    // Geolocation.getCurrentPosition(
-    //   position => {
-    //     let userLocation = {
-    //       userLocation: {
-    //         latitudeDelta: 0.0922,
-    //         longitudeDelta: 0.0421,
-    //         latitude: position.coords.latitude,
-    //         longitude: position.coords.longitude,
-    //       },
-    //     };
-    //     this.props.setLocationAction(userLocation);
-    //   },
-    //   error => alert(error.message),
-    //   {enableHighAccuracy: false, timeout: 20000, maximumAge: 1000},
-    // );
-    this.watchID = Geolocation.watchPosition(
-      position => {
-        let userLocation = {
-          userLocation: {
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          },
-        };
-        this.props.setLocationAction(userLocation);
-        // console.log({userLocation});
-      },
-      error => console.log(JSON.stringify(error.message)),
-      {
-        enableHighAccuracy: false,
-        timeout: 20000,
-        maximumAge: 0,
-        distanceFilter: 50,
-      },
-    );
-
-    console.log(this.watchID, 'watch id');
+  toggleFavourite = (product_id, whist_status) => {
+    let data = {
+      user_id: this.props.userProfileDetailsReducer.user_id,
+      product_id,
+      whist_status,
+    };
+    this.props.toggleFavouriteProductAction(data);
   };
 
-  componentWillUnmount = () => {
-    Geolocation.clearWatch(this.watchID);
-  };
+  // watchUserLocation = () => {
+  //   // Geolocation.getCurrentPosition(
+  //   //   position => {
+  //   //     let userLocation = {
+  //   //       userLocation: {
+  //   //         latitudeDelta: 0.0922,
+  //   //         longitudeDelta: 0.0421,
+  //   //         latitude: position.coords.latitude,
+  //   //         longitude: position.coords.longitude,
+  //   //       },
+  //   //     };
+  //   //     this.props.setLocationAction(userLocation);
+  //   //   },
+  //   //   error => alert(error.message),
+  //   //   {enableHighAccuracy: false, timeout: 20000, maximumAge: 1000},
+  //   // );
+  //   this.watchID = Geolocation.watchPosition(
+  //     position => {
+  //       let userLocation = {
+  //         userLocation: {
+  //           latitudeDelta: 0.0922,
+  //           longitudeDelta: 0.0421,
+  //           latitude: position.coords.latitude,
+  //           longitude: position.coords.longitude,
+  //         },
+  //       };
+  //       this.props.setLocationAction(userLocation);
+  //       // console.log({userLocation});
+  //     },
+  //     error => console.log(JSON.stringify(error.message)),
+  //     {
+  //       enableHighAccuracy: false,
+  //       timeout: 20000,
+  //       maximumAge: 0,
+  //       distanceFilter: 50,
+  //     },
+  //   );
+
+  //   console.log(this.watchID, 'watch id');
+  // };
+
+  // componentWillUnmount = () => {
+  //   Geolocation.clearWatch(this.watchID);
+  // };
+
   askPermissionAndGetLocation = async () => {
     try {
       let checkGpsPermission = await requestGpsPermission();
@@ -131,7 +147,7 @@ class DashboardScreen extends Component {
             let userLocation = await getUserLocation();
             this.props.setLocationAction(userLocation);
             this.searchProduct();
-            this.watchUserLocation();
+            // this.watchUserLocation();
           }
         }
       }
@@ -201,7 +217,7 @@ class DashboardScreen extends Component {
   render() {
     return (
       <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
-        <AppHeader />
+        {/* <AppHeader /> */}
         <View
           style={{
             justifyContent: 'center',
@@ -246,12 +262,12 @@ class DashboardScreen extends Component {
             </Text>
           </View>
         ) : null}
-        <Spinner
+        {/* <Spinner
           textContent="Loading.."
           visible={this.props.spinner}
           overlayColor="rgba(0,0,0,0.5)"
           textStyle={{color: 'white'}}
-        />
+        /> */}
         <View
           style={{
             flex: 1,
@@ -277,6 +293,7 @@ class DashboardScreen extends Component {
                   borderRadius: 4,
                   marginTop: 10,
                   overflow: 'hidden',
+                  position: 'relative',
                 }}>
                 <TouchableOpacity
                   activeOpacity={0.8}
@@ -287,6 +304,23 @@ class DashboardScreen extends Component {
                       product_owner_id: item.user_id,
                     })
                   }>
+                  <HeartIcon
+                    onPress={() =>
+                      this.toggleFavourite(item.product_id, item.is_whistlist)
+                    }
+                    name="heart"
+                    color={
+                      item.is_whistlist == 'true' ? 'red' : Colors.light_grey
+                    }
+                    size={24}
+                    style={{
+                      position: 'absolute',
+                      top: 5,
+                      right: 5,
+                      padding: 10,
+                      zIndex: 10,
+                    }}
+                  />
                   <Image
                     source={{
                       uri: `https://iodroid.in/redfrugten/uploads/${item.image}`,
@@ -381,9 +415,11 @@ const mapStateToProps = state => ({
   checkNetworkReducer: state.checkNetworkReducer,
   productListReducer: state.productListReducer,
   spinner: state.spinnerToggleReducers.spinner,
+  userProfileDetailsReducer: state.userProfileDetailsReducer,
 });
 
 export default connect(mapStateToProps, {
   setLocationAction,
   getProductListAction,
+  toggleFavouriteProductAction,
 })(DashboardScreen);

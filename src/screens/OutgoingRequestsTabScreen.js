@@ -51,7 +51,7 @@ class OutgoingRequestsTabScreen extends Component {
                       color: '#29d',
                     }}>
                     {moment(item.date_time).format('DD-MM-YY')} at{' '}
-                    {moment(item.date_time).format('hh:mm a')}
+                    {moment(item.date_time).format('HH:mm a')}
                   </Text>
                 </Text>
                 <Text

@@ -2,20 +2,23 @@ import {toogleSpinnerAction} from './toogleSpinnerAction';
 import {universalApiCall} from '../../utils/universalApiCall';
 import networkCheck from '../../utils/networkCheck';
 
-import {SET_PRODUCT_LIST} from '../constants/types';
+import {SET_FEV_PRODUCT_LIST} from '../constants/types';
 import {toastAndroidiOS} from '../../utils/toastAndroidiOS';
 
-const getProductListAction = data => (dispatch, getState) => {
-  console.log(getState().checkNetworkReducer, 'NETWORK CHECK RES');
+const getFevlistAction = () => (dispatch, getState) => {
   if (networkCheck(getState().checkNetworkReducer)) return;
   dispatch(toogleSpinnerAction(true));
 
-  universalApiCall('/listpointlocationbyuserandredius', 'post', data)
+  let data = {
+    user_id: getState().userProfileDetailsReducer.user_id,
+  };
+
+  universalApiCall('/pointlocationwhishlistbyuserid', 'POST', data)
     .then(res => {
-      console.log('product-list', res);
+      console.log('favorite-product-list', res);
       if (res.data.status) {
         dispatch({
-          type: SET_PRODUCT_LIST,
+          type: SET_FEV_PRODUCT_LIST,
           payload: res.data.result,
         });
       }
@@ -24,11 +27,11 @@ const getProductListAction = data => (dispatch, getState) => {
     .catch(err => {
       toastAndroidiOS(
         'Something went wrong in getting category list, Please try again',
-        3000,
+        1000,
       );
       dispatch(toogleSpinnerAction(false));
       console.log(err, err.response);
     });
 };
 
-export {getProductListAction};
+export {getFevlistAction};

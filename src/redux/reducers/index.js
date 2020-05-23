@@ -20,6 +20,7 @@ import activeProductTabReducer from './activeProductTabReducer';
 import allOrdersReducer from './allOrdersReducer';
 import SpecificOrderDetailsReducer from './SpecificOrderDetailsReducer';
 import requestListReducer from './requestListReducer';
+import productListForMapReducer from './productListForMapReducer';
 // Root Reducer
 const rootReducer = combineReducers({
   checkNetworkReducer,
@@ -41,6 +42,7 @@ const rootReducer = combineReducers({
   // SpecificOrderDetailsReducer,
   // activeProductTabReducer,
   requestListReducer,
+  productListForMapReducer,
 });
 
 // console.log({rootReducer});

@@ -6,7 +6,7 @@ const networkCheck = data => {
       setTimeout(() => {
         toastAndroidiOS(
           'Internet not available! Please Check your network and try again.',
-          1500,
+          2000,
         );
       }, 100);
       return true;

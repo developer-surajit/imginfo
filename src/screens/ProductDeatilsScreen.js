@@ -42,9 +42,9 @@ const initialRegion = {
   latitudeDelta: 0.0922,
   longitudeDelta: 0.0421,
 };
-
 import Toast from 'react-native-tiny-toast';
 import {toastAndroidiOS} from '../utils/toastAndroidiOS';
+import {getSentRequestListAction} from '../redux/actions';
 
 class ProductDeatilsScreen extends Component {
   constructor(props) {
@@ -203,8 +203,8 @@ class ProductDeatilsScreen extends Component {
 
   requestOwner = async () => {
     console.log(this.state, 'dddddddd');
+    const toast = Toast.showLoading('Loading...');
     try {
-      const toast = Toast.showLoading('Loading...');
       let {
         user_id,
         product_id,
@@ -215,7 +215,7 @@ class ProductDeatilsScreen extends Component {
 
       let dateTime = `${moment(requestDate).format('YYYY-MM-DD')} ${moment(
         requestTime,
-      ).format('HH:MM:SS')}`;
+      ).format('HH:mm:ss')}`;
       console.log(dateTime, 'dateTime');
       let submitData = {
         sender_user_id: user_id,
@@ -238,6 +238,7 @@ class ProductDeatilsScreen extends Component {
         // this.setState({
         //   loading: false,
         // });
+        this.props.getSentRequestListAction();
         toastAndroidiOS('Request submitted successfully', 1500);
       }
     } catch (error) {
@@ -271,6 +272,7 @@ class ProductDeatilsScreen extends Component {
 
   uploadImage = async (file, name) => {
     console.log(file, name, 'file details');
+    const imageToast = Toast.showLoading('Uploading...');
     try {
       let {user_id, product_id} = this.state;
       this.setState({
@@ -278,7 +280,6 @@ class ProductDeatilsScreen extends Component {
         imageUploading: true,
         uploadImageSuccessful: false,
       });
-      const imageToast = Toast.showLoading('Uploading...');
       let submitData = new FormData();
 
       const imgExtention = name.split('.').pop();
@@ -313,6 +314,7 @@ class ProductDeatilsScreen extends Component {
             `https://iodroid.in/redfrugten/uploads/${data.data.result.image}`,
           ],
         });
+        Toast.hide(imageToast);
         Alert.alert('Success', 'Image has been successfully uploaded', [
           {
             text: 'Close',
@@ -320,23 +322,28 @@ class ProductDeatilsScreen extends Component {
           },
         ]);
       } else {
-        Alert.alert('Failed', 'Image uploaded failed, Please try again', [
-          {
-            text: 'Close',
-            style: 'cancel',
-          },
-        ]);
+        Toast.hide(imageToast);
+        Alert.alert(
+          'Failed Upload',
+          'Image uploaded failed, Please try again',
+          [
+            {
+              text: 'Close',
+              style: 'cancel',
+            },
+          ],
+        );
       }
-      Toast.hide(imageToast);
+
       console.log(data, 'submit data');
     } catch (error) {
+      Toast.hide(imageToast);
       Alert.alert('Failed', 'Image uploaded failed, Please try again', [
         {
           text: 'Close',
           style: 'cancel',
         },
       ]);
-      Toast.hide(imageToast);
       console.log(error, 'error in submit');
     }
   };
@@ -891,4 +898,6 @@ const mapStateToProps = state => ({
   userLocation: state.userLocationReducer.userLocation,
 });
 
-export default connect(mapStateToProps)(ProductDeatilsScreen);
+export default connect(mapStateToProps, {getSentRequestListAction})(
+  ProductDeatilsScreen,
+);

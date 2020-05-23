@@ -15,6 +15,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import Colors from '../constants/Colors';
 import {StackActions, NavigationActions} from 'react-navigation';
 import {toastAndroidiOS} from '../utils/toastAndroidiOS';
+import {getProductListForMapAction} from '../redux/actions';
 import RadioForm, {
   RadioButton,
   RadioButtonInput,
@@ -24,7 +25,7 @@ var radio_props = [
   {label: 'Public', value: 'public'},
   {label: 'Private', value: 'private'},
 ];
-
+import {connect} from 'react-redux';
 class DetailsSubmitScreen extends Component {
   constructor(props) {
     super(props);
@@ -112,6 +113,11 @@ class DetailsSubmitScreen extends Component {
           loading: false,
         });
         toastAndroidiOS('Image uploaded successfully', 1500);
+        this.props.getProductListForMapAction({
+          redius: 200,
+          lat: userLocation.latitude,
+          lon: userLocation.longitude,
+        });
         const resetAction = StackActions.reset({
           index: 0,
           actions: [
@@ -208,6 +214,9 @@ class DetailsSubmitScreen extends Component {
             radio_props={radio_props}
             initial={0}
             buttonSize={14}
+            buttonColor={Colors.main_color}
+            selectedButtonColor={Colors.main_color}
+            animation={!true}
             onPress={value => {
               this.setState({property_type: value});
             }}
@@ -256,4 +265,6 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DetailsSubmitScreen;
+export default connect(null, {
+  getProductListForMapAction,
+})(DetailsSubmitScreen);
