@@ -6,6 +6,8 @@ const placeHolderImg = require('../assets/images/placeholder-1.jpg');
 import {connect} from 'react-redux';
 import Colors from '../constants/Colors';
 import HeartIcon from 'react-native-vector-icons/FontAwesome';
+import I18n from '../utils/I18n';
+
 class FevouriteListScreen extends Component {
   constructor(props) {
     super(props);
@@ -40,6 +42,7 @@ class FevouriteListScreen extends Component {
           marginBottom: 15,
           marginTop: 10,
         }}>
+        <Text>{I18n.t('hello')}</Text>
         <FlatList
           // data={DATA}
           // data={this.state.imgData}
@@ -150,6 +153,7 @@ const mapStateToProps = state => ({
   productListReducer: state.productListReducer,
   spinner: state.spinnerToggleReducers.spinner,
   userProfileDetailsReducer: state.userProfileDetailsReducer,
+  currentLanguage: state.currentLanguageReducer.currentLanguage,
 });
 
 export default connect(mapStateToProps, {

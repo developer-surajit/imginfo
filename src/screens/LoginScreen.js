@@ -23,6 +23,7 @@ import {connect} from 'react-redux';
 import {setUserDetailsAction} from '../redux/actions';
 import networkCheck from '../utils/networkCheck';
 // import Toast from 'react-native-tiny-toast';
+import I18n from '../utils/I18n';
 
 import {toastAndroidiOS} from '../utils/toastAndroidiOS';
 
@@ -32,6 +33,7 @@ class LoginScreen extends Component {
     this.state = {
       loading: false,
     };
+    // I18n.locale = 'fr';
   }
 
   validationSchema = () =>

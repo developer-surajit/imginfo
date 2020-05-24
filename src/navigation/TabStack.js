@@ -6,8 +6,9 @@ import FevStack from './FevStack';
 import RequestTabStack from './RequestTabStack';
 import Colors from '../constants/Colors';
 import AppStack from './AppStack';
-import MapTabScreen from '../screens/MapTabScreen';
+// import MapTabScreen from '../screens/MapTabScreen';
 import SettingsTabStack from './SettingsTabStack';
+import MapTabStack from './MapTabStack';
 
 const TabBarComponent = props => <BottomTabBar {...props} />;
 
@@ -27,8 +28,8 @@ export default createBottomTabNavigator(
         title: 'Request',
       },
     },
-    MapTabScreen: {
-      screen: MapTabScreen,
+    MapTabStack: {
+      screen: MapTabStack,
       navigationOptions: {
         title: 'Map',
       },
@@ -57,7 +58,7 @@ export default createBottomTabNavigator(
         }}
       />
     ),
-    initialRouteName: 'MapTabScreen',
+    initialRouteName: 'MapTabStack',
     defaultNavigationOptions: ({navigation}) => ({
       tabBarIcon: ({focused, horizontal, tintColor}) => {
         const {routeName} = navigation.state;
@@ -67,7 +68,7 @@ export default createBottomTabNavigator(
           iconName = 'home';
         } else if (routeName === 'RequestTabStack') {
           iconName = 'exchange';
-        } else if (routeName === 'MapTabScreen') {
+        } else if (routeName === 'MapTabStack') {
           iconName = 'map';
         } else if (routeName === 'FevStack') {
           iconName = 'heart';

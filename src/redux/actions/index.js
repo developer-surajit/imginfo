@@ -11,3 +11,4 @@ export * from './getSentRequestListAction';
 export * from './getProductListForMapAction';
 export * from './getFevlistAction';
 export * from './toggleFavouriteProductAction';
+export * from './setCurrentLanguage';

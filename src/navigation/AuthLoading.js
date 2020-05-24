@@ -14,14 +14,15 @@ import AsyncStorage from '@react-native-community/async-storage';
 const splash = require('../assets/images/splash.jpeg');
 import {connect} from 'react-redux';
 import {setUserDetailsAction} from '../redux/actions';
-
+import * as RNLocalize from 'react-native-localize';
 class AuthLoading extends React.Component {
   state = {
     isLoading: true,
   };
   componentDidMount = () => {
     // AsyncStorage.removeItem('user_id')
-    setTimeout(() => this._bootstrapAsync(), 5000);
+    // setTimeout(() => this._bootstrapAsync(), 5000);
+    this._bootstrapAsync();
   };
 
   // Fetch the token from storage then navigate to our appropriate place
@@ -64,9 +65,6 @@ const styles = StyleSheet.create({
   },
 });
 
-export default connect(
-  null,
-  {
-    setUserDetailsAction,
-  },
-)(AuthLoading);
+export default connect(null, {
+  setUserDetailsAction,
+})(AuthLoading);

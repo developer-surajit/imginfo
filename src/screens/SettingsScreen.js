@@ -7,11 +7,15 @@ import {toastAndroidiOS} from '../utils/toastAndroidiOS';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import I18n from '../utils/I18n';
+import {setCurrentLanguage} from '../redux/actions';
+import {connect} from 'react-redux';
 
-export default class SettingsScreen extends Component {
+class SettingsScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {};
+    console.log('i18', I18n);
   }
   logoutUser = async () => {
     try {
@@ -22,11 +26,24 @@ export default class SettingsScreen extends Component {
     }
   };
 
+  setLang = async val => {
+    try {
+      this.props.setCurrentLanguage(val);
+      I18n.locale = val;
+      I18n.defaultLocale = val;
+      await AsyncStorage.setItem('currentLang', val);
+      console.log('val', val);
+      console.log('i18', I18n);
+    } catch (error) {
+      console.log(error, 'in currentLang');
+    }
+  };
+
   render() {
     return (
       <View style={{flex: 1, marginTop: 15}}>
         <TouchableOpacity
-          onPress={() => toastAndroidiOS('Not implemented yet', 2000)}
+          onPress={() => this.setLang('en-GB')}
           style={{
             flexDirection: 'row',
             alignItems: 'center',
@@ -35,9 +52,21 @@ export default class SettingsScreen extends Component {
             marginBottom: 5,
           }}>
           <FontAwesome name="language" size={20} color={Colors.main_color} />
-          <Text style={{marginLeft: 15}}>Change Language</Text>
+          <Text style={{marginLeft: 15}}>Change Language en</Text>
         </TouchableOpacity>
-
+        <TouchableOpacity
+          onPress={() => this.setLang('fr-FR')}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingVertical: 10,
+            paddingHorizontal: 15,
+            marginBottom: 5,
+          }}>
+          <FontAwesome name="language" size={20} color={Colors.main_color} />
+          <Text style={{marginLeft: 15}}>Change Language fr</Text>
+        </TouchableOpacity>
+        <Text>{I18n.t('hello')}</Text>
         <TouchableOpacity
           onPress={() => this.logoutUser()}
           style={{
@@ -78,3 +107,12 @@ export default class SettingsScreen extends Component {
     );
   }
 }
+
+const mapStateToProps = state => ({
+  spinner: state.spinnerToggleReducers.spinner,
+  currentLanguage: state.currentLanguageReducer.currentLanguage,
+});
+
+export default connect(mapStateToProps, {
+  setCurrentLanguage,
+})(SettingsScreen);

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Text, BackHandler, StyleSheet} from 'react-native';
+import {View, Text, BackHandler, StyleSheet, Image} from 'react-native';
 import {
   setLocationAction,
   getProductListForMapAction,
@@ -8,7 +8,7 @@ import {
   getProductListAction,
 } from '../redux/actions';
 import {connect} from 'react-redux';
-import {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
+import {Marker, PROVIDER_GOOGLE, Callout} from 'react-native-maps';
 import AsyncStorage from '@react-native-community/async-storage';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Colors from '../constants/Colors';
@@ -17,9 +17,9 @@ import enableGpsAndroid from '../utils/enableGpsAndroid';
 import getUserLocation from '../utils/getUserLocation';
 import Geolocation from '@react-native-community/geolocation';
 import isEmpty from '../utils/isEmpty';
-
 import MapView from 'react-native-map-clustering';
-
+// import CustomCallout from '../shared/components/CustomCallout';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 const initialRegion = {
   latitude: -37.78825,
   longitude: -122.4324,
@@ -198,24 +198,91 @@ class MapTabScreen extends Component {
             // region={userLocation}
             initialRegion={userLocation}>
             {!isEmpty(this.props.productListForMapReducer.mapList) &&
-              this.props.productListForMapReducer.mapList.map(item => (
-                <Marker
-                  key={parseInt(item.product_id)}
-                  coordinate={{
-                    latitude: parseFloat(item.lat),
-                    longitude: parseFloat(item.lon),
-                  }}
-                />
-              ))}
-            {/* <Marker coordinate={{latitude: 52.4, longitude: 18.7}} />
-            <Marker coordinate={{latitude: 52.1, longitude: 18.4}} />
-            <Marker coordinate={{latitude: 52.6, longitude: 18.3}} />
-            <Marker coordinate={{latitude: 51.6, longitude: 18.0}} />
-            <Marker coordinate={{latitude: 53.1, longitude: 18.8}} />
-            <Marker coordinate={{latitude: 52.9, longitude: 19.4}} />
-            <Marker coordinate={{latitude: 52.2, longitude: 21}} />
-            <Marker coordinate={{latitude: 52.4, longitude: 21}} />
-            <Marker coordinate={{latitude: 51.8, longitude: 20}} /> */}
+              this.props.productListForMapReducer.mapList.map(item => {
+                let url = `https://iodroid.in/redfrugten/uploads/${item.image}`;
+                return (
+                  <Marker
+                    key={parseInt(item.product_id)}
+                    coordinate={{
+                      latitude: parseFloat(item.lat),
+                      longitude: parseFloat(item.lon),
+                    }}>
+                    <Image
+                      source={{
+                        uri: url,
+                      }}
+                      resizeMode="cover"
+                      style={{height: 0, width: 0}}
+                    />
+                    <FontAwesome5
+                      name="map-marker-alt"
+                      size={24}
+                      color="red"
+                      style={{height: 50, width: 50}}
+                    />
+                    <Callout
+                      tooltip={true}
+                      onPress={() =>
+                        this.props.navigation.navigate(
+                          'ProductDeatilsScreenAA',
+                          {
+                            product_id: item.product_id,
+                            product_owner_id: item.user_id,
+                          },
+                        )
+                      }
+                      style={{backgroundColor: 'white', flex: 1, padding: 10}}>
+                      <Text
+                        style={{
+                          width: 200,
+                          height: 200,
+                        }}>
+                        <Image
+                          style={{
+                            width: 200,
+                            height: 200,
+                            resizeMode: 'contain',
+                          }}
+                          source={{
+                            uri: url,
+                          }}
+                        />
+                      </Text>
+                      <Text> {item.desc}</Text>
+                      {/* <View
+                        style={{
+                          paddingHorizontal: 8,
+                          paddingVertical: 5,
+                          backgroundColor: 'white',
+                          borderColor: Colors.main_color_light_1,
+                          // flex: 1,
+                          // height: 100,
+                          // width: 200,
+                          // width: 200,
+                        }}>
+                        <Text
+                          style={{
+                            width: 200,
+                            height: 200,
+                          }}>
+                          <Image
+                            style={{
+                              width: 200,
+                              height: 200,
+                              resizeMode: 'contain',
+                            }}
+                            source={{
+                              uri: url,
+                            }}
+                          />
+                          {item.desc}
+                        </Text>
+                      <Text>{item.desc}</Text>
+                      </View> */}
+                    </Callout>
+                  </Marker>
+                );
+              })}
           </MapView>
         )}
       </View>
