@@ -15,14 +15,30 @@ import NetInfo from '@react-native-community/netinfo';
 import {checkNetworkAction, setCurrentLanguage} from './src/redux/actions';
 import {connect} from 'react-redux';
 import I18n from './src/utils/I18n';
+import AsyncStorage from '@react-native-community/async-storage';
 export class App extends React.Component {
   componentDidMount = () => {
+    this.setLanguage();
     this.NetInfoEvent = NetInfo.addEventListener(state => {
       this.props.checkNetworkAction(state);
     });
     RNLocalize.addEventListener('change', () => {
       this.handleLocales();
     });
+  };
+
+  setLanguage = async () => {
+    try {
+      let currentLang = await AsyncStorage.getItem('currentLang');
+      console.log('currentLang', currentLang);
+      if (currentLang) {
+        I18n.locale = currentLang;
+        I18n.defaultLocale = currentLang;
+        this.props.setCurrentLanguage(currentLang);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   handleLocales = async () => {

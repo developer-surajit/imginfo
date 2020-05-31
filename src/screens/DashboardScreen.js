@@ -35,7 +35,7 @@ import {
 } from '../redux/actions';
 import {connect} from 'react-redux';
 import networkCheck from '../utils/networkCheck';
-
+import I18n from '../utils/I18n';
 import HeartIcon from 'react-native-vector-icons/FontAwesome';
 
 let DATA = [
@@ -225,7 +225,7 @@ class DashboardScreen extends Component {
             marginBottom: 5,
           }}>
           <Text style={{marginTop: 15, fontSize: 16}}>
-            Searching withing {this.state.range} km range
+            {I18n.t('Searching_text')} {this.state.range} km
           </Text>
 
           <Slider
@@ -416,6 +416,7 @@ const mapStateToProps = state => ({
   productListReducer: state.productListReducer,
   spinner: state.spinnerToggleReducers.spinner,
   userProfileDetailsReducer: state.userProfileDetailsReducer,
+  currentLanguage: state.currentLanguageReducer.currentLanguage,
 });
 
 export default connect(mapStateToProps, {

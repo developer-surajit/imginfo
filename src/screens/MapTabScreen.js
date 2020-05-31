@@ -18,6 +18,7 @@ import getUserLocation from '../utils/getUserLocation';
 import Geolocation from '@react-native-community/geolocation';
 import isEmpty from '../utils/isEmpty';
 import MapView from 'react-native-map-clustering';
+import I18n from '../utils/I18n';
 // import CustomCallout from '../shared/components/CustomCallout';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 const initialRegion = {
@@ -302,6 +303,7 @@ const mapStateToProps = state => ({
   checkNetworkReducer: state.checkNetworkReducer,
   productListForMapReducer: state.productListForMapReducer,
   spinner: state.spinnerToggleReducers.spinner,
+  currentLanguage: state.currentLanguageReducer.currentLanguage,
 });
 
 export default connect(mapStateToProps, {

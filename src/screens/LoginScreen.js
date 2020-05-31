@@ -40,11 +40,11 @@ class LoginScreen extends Component {
     Yup.object().shape({
       email: Yup.string()
         .label('email')
-        .email('Please enter correct email')
-        .required('Please enter the Email'),
+        .email(I18n.t('email_error'))
+        .required(I18n.t('email_blank')),
       password: Yup.string()
         .label('password')
-        .required('Please enter password'),
+        .required(I18n.t('pass_blank')),
     });
 
   loginUser = async values => {
@@ -53,17 +53,17 @@ class LoginScreen extends Component {
       this.setState({
         loading: true,
       });
-      let {name, email, password} = values;
+      let {email, password} = values;
       let login = await universalApiCall('/userLogin', 'POST', {
         email,
         password,
       });
 
       if (login.data.status) {
-        toastAndroidiOS('Login successfully', 2000);
+        toastAndroidiOS(I18n.t('login_success'), 2000);
         this.saveDetails(login.data.result);
       } else {
-        toastAndroidiOS('Sorry, Please enter valid login creadentials', 2000);
+        toastAndroidiOS(I18n.t('invalid_login'), 2000);
       }
       this.setState({
         loading: false,
@@ -75,7 +75,7 @@ class LoginScreen extends Component {
       this.setState({
         loading: false,
       });
-      toastAndroidiOS('Sorry, Please enter valid login creadentials', 2000);
+      toastAndroidiOS(I18n.t('invalid_login'), 2000);
       console.log(error.response);
     }
   };
@@ -96,7 +96,7 @@ class LoginScreen extends Component {
     return (
       <View style={styles.containerView}>
         <Spinner
-          textContent="Loading.."
+          textContent={I18n.t('Loading')}
           visible={this.state.loading}
           overlayColor="rgba(0,0,0,0.5)"
           textStyle={{color: 'white'}}
@@ -145,24 +145,24 @@ class LoginScreen extends Component {
                     />
                   </View>
                   <Input
-                    placeholder="Email"
+                    placeholder={I18n.t('Email')}
                     value={values.email}
                     leftIconContainerStyle={{}}
                     onChangeText={handleChange('email')}
-                    containerStyle={{marginBottom: 20}}
+                    containerStyle={{marginBottom: 10}}
                   />
-                  {errors.email && (
+                  {errors.email && touched.email && (
                     <Text style={styles.errorStyle}>{errors.email}</Text>
                   )}
                   <Input
-                    placeholder="Password"
+                    placeholder={I18n.t('Password')}
                     value={values.password}
                     type="password"
                     onChangeText={handleChange('password')}
                     secureTextEntry={true}
-                    containerStyle={{marginBottom: 20}}
+                    containerStyle={{marginBottom: 10}}
                   />
-                  {errors.password && (
+                  {errors.password && touched.password && (
                     <Text style={styles.errorStyle}>{errors.password}</Text>
                   )}
 
@@ -171,7 +171,7 @@ class LoginScreen extends Component {
                     containerStyle={{marginHorizontal: 20, marginTop: 25}}
                     onPress={handleSubmit}
                     titleStyle={{color: 'white'}}
-                    title="Sign in"
+                    title={I18n.t('Sign_in')}
                     raised
                   />
 
@@ -189,7 +189,7 @@ class LoginScreen extends Component {
                         paddingVertical: 15,
                         color: Colors.main_color,
                       }}>
-                      New user ? go to Sign up
+                      {I18n.t('new_user_sign_up')}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -222,10 +222,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   errorStyle: {
-    paddingHorizontal: 5,
-    paddingVertical: 5,
+    paddingHorizontal: 15,
+    marginTop: -5,
+    // paddingVertical: 5,
     color: '#f44336',
-    textAlign: 'center',
+    // textAlign: 'center',
   },
   loginFormView: {
     textAlign: 'center',
@@ -271,6 +272,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
   checkNetworkReducer: state.checkNetworkReducer,
+  currentLanguage: state.currentLanguageReducer.currentLanguage,
 });
 
 export default connect(mapStateToProps, {setUserDetailsAction})(LoginScreen);

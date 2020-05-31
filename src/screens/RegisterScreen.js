@@ -22,7 +22,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import Colors from '../constants/Colors';
 import networkCheck from '../utils/networkCheck';
 import {connect} from 'react-redux';
-
+import I18n from '../utils/I18n';
 import {toastAndroidiOS} from '../utils/toastAndroidiOS';
 
 class RegisterScreen extends Component {
@@ -36,19 +36,19 @@ class RegisterScreen extends Component {
   validationSchema = () =>
     Yup.object().shape({
       name: Yup.string()
-        .required('Please enter your name')
+        .required(I18n.t('name_blank'))
         .label('name'),
       // address: Yup.string()
       //   .required('Please enter your address')
       //   .label('address'),
       email: Yup.string()
         .label('email')
-        .email('Please enter correct email')
-        .required('Please enter the Email'),
+        .email(I18n.t('email_error'))
+        .required(I18n.t('email_blank')),
       password: Yup.string()
         .label('password')
-        .required('Please enter password')
-        .min(6, 'Password must be at least 6 characters long'),
+        .required(I18n.t('pass_blank')),
+      // .min(6, 'Password must be at least 6 characters long'),
 
       // phone: Yup.string()
       //   .required('Please enter phone number')
@@ -76,10 +76,10 @@ class RegisterScreen extends Component {
         loading: false,
       });
       if (register.data.status) {
-        toastAndroidiOS('User created successfully', 2000);
+        toastAndroidiOS(I18n.t('user_success'), 2000);
         this.props.navigation.goBack();
       } else {
-        toastAndroidiOS('User created failed, please try again', 2000);
+        toastAndroidiOS(I18n.t('user_failed'), 2000);
       }
 
       console.log('register response', register);
@@ -89,7 +89,7 @@ class RegisterScreen extends Component {
         {
           loading: false,
         },
-        () => toastAndroidiOS('Something went wrong, please try again', 2000),
+        () => toastAndroidiOS(I18n.t('something_wrong'), 2000),
       );
 
       console.log(error.response);
@@ -100,7 +100,7 @@ class RegisterScreen extends Component {
     return (
       <View style={styles.containerView}>
         <Spinner
-          textContent="Loading.."
+          textContent={I18n.t('Loading')}
           visible={this.state.loading}
           overlayColor="rgba(0,0,0,0.5)"
           textStyle={{color: 'white'}}
@@ -150,34 +150,34 @@ class RegisterScreen extends Component {
                     />
                   </View>
                   <Input
-                    placeholder="Name"
+                    placeholder={I18n.t('name')}
                     value={values.name}
                     leftIconContainerStyle={{}}
                     onChangeText={handleChange('name')}
-                    containerStyle={{marginBottom: 20}}
+                    containerStyle={{marginBottom: 10}}
                   />
-                  {errors.name && (
+                  {errors.name && touched.name && (
                     <Text style={styles.errorStyle}>{errors.name}</Text>
                   )}
                   <Input
-                    placeholder="Email"
+                    placeholder={I18n.t('Email')}
                     value={values.email}
                     leftIconContainerStyle={{}}
                     onChangeText={handleChange('email')}
-                    containerStyle={{marginBottom: 20}}
+                    containerStyle={{marginBottom: 10}}
                   />
-                  {errors.email && (
+                  {errors.email && touched.email && (
                     <Text style={styles.errorStyle}>{errors.email}</Text>
                   )}
                   <Input
-                    placeholder="Password"
+                    placeholder={I18n.t('Password')}
                     value={values.password}
                     type="password"
                     onChangeText={handleChange('password')}
                     secureTextEntry={true}
-                    containerStyle={{marginBottom: 20}}
+                    containerStyle={{marginBottom: 10}}
                   />
-                  {errors.password && (
+                  {errors.password && touched.password && (
                     <Text style={styles.errorStyle}>{errors.password}</Text>
                   )}
 
@@ -186,7 +186,7 @@ class RegisterScreen extends Component {
                     containerStyle={{marginHorizontal: 20, marginTop: 25}}
                     onPress={handleSubmit}
                     titleStyle={{color: 'white'}}
-                    title="Sign Up"
+                    title={I18n.t('sign_up')}
                     raised
                   />
 
@@ -204,7 +204,7 @@ class RegisterScreen extends Component {
                         paddingVertical: 15,
                         color: Colors.main_color,
                       }}>
-                      Old user ? go to Sign in
+                      {I18n.t('Old_user')}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -237,10 +237,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   errorStyle: {
-    paddingHorizontal: 5,
+    paddingHorizontal: 15,
+    marginTop: -5,
     // paddingVertical: 5,
     color: '#f44336',
-    textAlign: 'center',
+    // textAlign: 'center',
   },
   loginFormView: {
     textAlign: 'center',
@@ -286,6 +287,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
   checkNetworkReducer: state.checkNetworkReducer,
+  currentLanguage: state.currentLanguageReducer.currentLanguage,
 });
 
 export default connect(mapStateToProps)(RegisterScreen);

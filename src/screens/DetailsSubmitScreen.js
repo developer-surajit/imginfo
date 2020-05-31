@@ -16,6 +16,7 @@ import Colors from '../constants/Colors';
 import {StackActions, NavigationActions} from 'react-navigation';
 import {toastAndroidiOS} from '../utils/toastAndroidiOS';
 import {getProductListForMapAction} from '../redux/actions';
+import I18n from '../utils/I18n';
 import RadioForm, {
   RadioButton,
   RadioButtonInput,
@@ -264,7 +265,10 @@ const styles = StyleSheet.create({
     // marginVertical: 15, // was 20,
   },
 });
+const mapStateToProps = state => ({
+  currentLanguage: state.currentLanguageReducer.currentLanguage,
+});
 
-export default connect(null, {
+export default connect(mapStateToProps, {
   getProductListForMapAction,
 })(DetailsSubmitScreen);

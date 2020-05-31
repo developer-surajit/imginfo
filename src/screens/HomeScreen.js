@@ -24,6 +24,7 @@ const deviceHeight = Dimensions.get('window').height;
 import {connect} from 'react-redux';
 import requestCameraPermission from './../utils/requestCameraPermission';
 // import { ScrollView } from 'react-native-gesture-handler';
+import I18n from '../utils/I18n';
 const initialRegion = {
   latitude: -37.78825,
   longitude: -122.4324,
@@ -390,6 +391,7 @@ const mapStateToProps = state => ({
   userLocation: state.userLocationReducer.userLocation,
   checkNetworkReducer: state.checkNetworkReducer,
   spinner: state.spinnerToggleReducers.spinner,
+  currentLanguage: state.currentLanguageReducer.currentLanguage,
 });
 
 export default connect(mapStateToProps)(HomeScreen);

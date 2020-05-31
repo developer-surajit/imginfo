@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {View, Text, StyleSheet, FlatList, Image} from 'react-native';
 import {connect} from 'react-redux';
 import moment from 'moment';
-
+import I18n from '../utils/I18n';
 import {Button} from 'react-native-elements';
 class OutgoingRequestsTabScreen extends Component {
   constructor(props) {
@@ -73,7 +73,7 @@ class OutgoingRequestsTabScreen extends Component {
                           : '#fa383e',
                     }}>
                     {item.status.toLowerCase() == 'unditermind'
-                      ? 'Not reponded'
+                      ? 'Not responded'
                       : item.status.toLowerCase() == 'allow'
                       ? 'Request Accepted'
                       : 'Request Rejected'}
@@ -110,6 +110,7 @@ const styles = StyleSheet.create({});
 const mapStateToProps = state => ({
   requestListReducer: state.requestListReducer,
   spinner: state.spinnerToggleReducers.spinner,
+  currentLanguage: state.currentLanguageReducer.currentLanguage,
 });
 
 export default connect(mapStateToProps, {})(OutgoingRequestsTabScreen);

@@ -7,7 +7,7 @@ import {Button} from 'react-native-elements';
 import {Colors} from '../constants/Colors';
 import Toast from 'react-native-tiny-toast';
 import {changeRequestStatusAction} from '../redux/actions';
-
+import I18n from '../utils/I18n';
 class IncomingRequestsTabScreen extends Component {
   constructor(props) {
     super(props);
@@ -138,6 +138,7 @@ const styles = StyleSheet.create({});
 const mapStateToProps = state => ({
   requestListReducer: state.requestListReducer,
   spinner: state.spinnerToggleReducers.spinner,
+  currentLanguage: state.currentLanguageReducer.currentLanguage,
 });
 
 export default connect(mapStateToProps, {changeRequestStatusAction})(

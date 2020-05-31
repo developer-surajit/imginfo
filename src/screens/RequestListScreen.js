@@ -10,7 +10,7 @@ import OutgoingRequestsTabScreen from './OutgoingRequestsTabScreen';
 import IncomingRequestsTabScreen from './IncomingRequestsTabScreen';
 import {connect} from 'react-redux';
 import {getRequestListAction, getSentRequestListAction} from '../redux/actions';
-
+import I18n from '../utils/I18n';
 class RequestListScreen extends Component {
   constructor(props) {
     super(props);
@@ -120,7 +120,7 @@ class RequestListScreen extends Component {
 const styles = StyleSheet.create({});
 
 const mapStateToProps = state => ({
-  // requestListReducer: state.requestListReducer,
+  currentLanguage: state.currentLanguageReducer.currentLanguage,
 });
 
 export default connect(mapStateToProps, {

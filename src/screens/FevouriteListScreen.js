@@ -42,7 +42,6 @@ class FevouriteListScreen extends Component {
           marginBottom: 15,
           marginTop: 10,
         }}>
-        <Text>{I18n.t('hello')}</Text>
         <FlatList
           // data={DATA}
           // data={this.state.imgData}

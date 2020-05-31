@@ -36,6 +36,7 @@ import {convertDistance, getDistance} from 'geolib';
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
 import Carousel, {Pagination} from 'react-native-snap-carousel';
+import I18n from '../utils/I18n';
 const initialRegion = {
   latitude: -37.78825,
   longitude: -122.4324,
@@ -896,6 +897,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = state => ({
   checkNetworkReducer: state.checkNetworkReducer,
   userLocation: state.userLocationReducer.userLocation,
+  currentLanguage: state.currentLanguageReducer.currentLanguage,
 });
 
 export default connect(mapStateToProps, {getSentRequestListAction})(

@@ -9,7 +9,7 @@ import AppStack from './AppStack';
 // import MapTabScreen from '../screens/MapTabScreen';
 import SettingsTabStack from './SettingsTabStack';
 import MapTabStack from './MapTabStack';
-
+import I18n from '../utils/I18n';
 const TabBarComponent = props => <BottomTabBar {...props} />;
 
 export default createBottomTabNavigator(
@@ -18,7 +18,7 @@ export default createBottomTabNavigator(
       screen: AppStack,
       path: 'app',
       navigationOptions: {
-        title: 'List',
+        title: `${I18n.t('List')}`,
         // tabBarVisible: false,
       },
     },

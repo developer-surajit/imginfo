@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Text, Alert} from 'react-native';
+import {View, Text, Alert, StyleSheet} from 'react-native';
 import {Button} from 'react-native-elements';
 import Colors from '../constants/Colors';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -10,11 +10,13 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import I18n from '../utils/I18n';
 import {setCurrentLanguage} from '../redux/actions';
 import {connect} from 'react-redux';
-
+import {Picker} from '@react-native-community/picker';
 class SettingsScreen extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      language: 'java',
+    };
     console.log('i18', I18n);
   }
   logoutUser = async () => {
@@ -42,31 +44,39 @@ class SettingsScreen extends Component {
   render() {
     return (
       <View style={{flex: 1, marginTop: 15}}>
-        <TouchableOpacity
-          onPress={() => this.setLang('en-GB')}
+        <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            paddingVertical: 10,
+            justifyContent: 'space-between',
             paddingHorizontal: 15,
             marginBottom: 5,
           }}>
-          <FontAwesome name="language" size={20} color={Colors.main_color} />
-          <Text style={{marginLeft: 15}}>Change Language en</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => this.setLang('fr-FR')}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            paddingVertical: 10,
-            paddingHorizontal: 15,
-            marginBottom: 5,
-          }}>
-          <FontAwesome name="language" size={20} color={Colors.main_color} />
-          <Text style={{marginLeft: 15}}>Change Language fr</Text>
-        </TouchableOpacity>
-        <Text>{I18n.t('hello')}</Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <FontAwesome name="language" size={20} color={Colors.main_color} />
+            <Text style={{marginLeft: 15}}>{I18n.t('Change_language')}</Text>
+          </View>
+          <View
+            style={{
+              borderColor: Colors.dark_grey,
+              borderWidth: StyleSheet.hairlineWidth,
+              borderRadius: 5,
+            }}>
+            <Picker
+              mode="dropdown"
+              selectedValue={this.props.currentLanguage}
+              style={{height: 50, width: 150}}
+              onValueChange={(itemValue, itemIndex) => this.setLang(itemValue)}>
+              <Picker.Item label="English" value="en-GB" />
+              <Picker.Item label="Danish" value="da" />
+            </Picker>
+          </View>
+        </View>
+
         <TouchableOpacity
           onPress={() => this.logoutUser()}
           style={{
@@ -76,7 +86,7 @@ class SettingsScreen extends Component {
             paddingHorizontal: 15,
           }}>
           <AntDesign name="logout" size={20} color={Colors.main_color} />
-          <Text style={{marginLeft: 15}}>Logout</Text>
+          <Text style={{marginLeft: 15}}>{I18n.t('Logout')}</Text>
         </TouchableOpacity>
 
         {/* <Button
