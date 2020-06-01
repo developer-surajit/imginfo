@@ -16,6 +16,9 @@ class FevouriteListScreen extends Component {
     };
   }
 
+  static navigationOptions = () => ({
+    headerTitle: I18n.t('Favourite'),
+  });
   // componentDidMount = () => {
   //   this.props.getFevlistAction();
   // };
@@ -105,7 +108,7 @@ class FevouriteListScreen extends Component {
                     paddingVertical: 15,
                     paddingHorizontal: 15,
                   }}>
-                  Description :{' '}
+                  {I18n.t('Description')} :{' '}
                   <Text
                     style={{fontSize: 16, fontFamily: 'sans-serif-regular'}}>
                     {item.desc}
@@ -137,7 +140,7 @@ class FevouriteListScreen extends Component {
                   marginTop: 15,
                   paddingLeft: 5,
                 }}>
-                Favorite list is empty
+                {I18n.t('fev_empty')}
               </Text>
             </View>
           }

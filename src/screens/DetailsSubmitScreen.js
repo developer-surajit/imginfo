@@ -39,6 +39,9 @@ class DetailsSubmitScreen extends Component {
       property_type: 'public',
     };
   }
+  static navigationOptions = () => ({
+    headerTitle: I18n.t('Submit_Item'),
+  });
 
   componentDidMount = async () => {
     let userLocation = this.props.navigation.getParam('userLocation');
@@ -113,7 +116,7 @@ class DetailsSubmitScreen extends Component {
         this.setState({
           loading: false,
         });
-        toastAndroidiOS('Image uploaded successfully', 1500);
+        toastAndroidiOS(I18n.t('Image_uploaded_successfully'), 1500);
         this.props.getProductListForMapAction({
           redius: 200,
           lat: userLocation.latitude,
@@ -128,10 +131,13 @@ class DetailsSubmitScreen extends Component {
         });
         this.props.navigation.dispatch(resetAction);
         // this.props.navigation.push('HomeScreen');
+      } else {
+        toastAndroidiOS(I18n.t('something_wrong'), 1500);
       }
 
       console.log(data, 'submit data');
     } catch (error) {
+      toastAndroidiOS(I18n.t('something_wrong'), 1500);
       this.setState({
         loading: false,
       });
@@ -150,7 +156,7 @@ class DetailsSubmitScreen extends Component {
     return (
       <ScrollView style={{flex: 1}} keyboardShouldPersistTaps="always">
         <Spinner
-          textContent="Loading.."
+          textContent={I18n.t('Loading')}
           visible={this.state.loading}
           overlayColor="rgba(0,0,0,0.5)"
           textStyle={{color: 'white'}}
@@ -185,7 +191,7 @@ class DetailsSubmitScreen extends Component {
             marginTop: 20,
             color: '#333',
           }}>
-          Description
+          {I18n.t('Description')}
         </Text>
         <View>
           <Input
@@ -198,7 +204,7 @@ class DetailsSubmitScreen extends Component {
               marginBottom: 15,
             }}
             value={this.state.comment}
-            placeholder="Comment"
+            placeholder={I18n.t('Comment')}
             multiline
             textAlignVertical="top"
             numberOfLines={4}
@@ -210,7 +216,7 @@ class DetailsSubmitScreen extends Component {
         </View>
 
         <View style={{paddingHorizontal: 15}}>
-          <Text style={{marginBottom: 10}}>Property type</Text>
+          <Text style={{marginBottom: 10}}>{I18n.t('Property_type')}</Text>
           <RadioForm
             radio_props={radio_props}
             initial={0}
@@ -230,7 +236,7 @@ class DetailsSubmitScreen extends Component {
             backgroundColor: Colors.main_color,
           }}
           containerStyle={{marginHorizontal: 20, marginTop: 25}}
-          title="Submit"
+          title={I18n.t('Submit')}
           onPress={this.submitDetails}
           titleStyle={{color: 'white'}}
           disabled={!this.state.comment}

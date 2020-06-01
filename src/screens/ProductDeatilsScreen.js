@@ -74,6 +74,10 @@ class ProductDeatilsScreen extends Component {
     this.c = React.createRef();
   }
 
+  static navigationOptions = () => ({
+    headerTitle: I18n.t('Product_Details'),
+  });
+
   componentDidMount = async () => {
     let product_id = this.props.navigation.getParam('product_id');
     let product_owner_id = this.props.navigation.getParam('product_owner_id');
@@ -240,11 +244,11 @@ class ProductDeatilsScreen extends Component {
         //   loading: false,
         // });
         this.props.getSentRequestListAction();
-        toastAndroidiOS('Request submitted successfully', 1500);
+        toastAndroidiOS(I18n.t('Request_success'), 1500);
       }
     } catch (error) {
       Toast.hide(toast);
-      toastAndroidiOS('Something went wrong, Please try again', 1500);
+      toastAndroidiOS(I18n.t('something_wrong'), 1500);
       this.setState({
         loading: false,
       });
@@ -316,32 +320,28 @@ class ProductDeatilsScreen extends Component {
           ],
         });
         Toast.hide(imageToast);
-        Alert.alert('Success', 'Image has been successfully uploaded', [
+        Alert.alert('Success', I18n.t('Image_uploaded_successfully'), [
           {
-            text: 'Close',
+            text: I18n.t('Close'),
             style: 'cancel',
           },
         ]);
       } else {
         Toast.hide(imageToast);
-        Alert.alert(
-          'Failed Upload',
-          'Image uploaded failed, Please try again',
-          [
-            {
-              text: 'Close',
-              style: 'cancel',
-            },
-          ],
-        );
+        Alert.alert('Failed Upload', I18n.t('Image_uploaded_failed'), [
+          {
+            text: I18n.t('Close'),
+            style: 'cancel',
+          },
+        ]);
       }
 
       console.log(data, 'submit data');
     } catch (error) {
       Toast.hide(imageToast);
-      Alert.alert('Failed', 'Image uploaded failed, Please try again', [
+      Alert.alert('Failed', I18n.t('Image_uploaded_failed'), [
         {
-          text: 'Close',
+          text: I18n.t('Close'),
           style: 'cancel',
         },
       ]);
@@ -358,13 +358,13 @@ class ProductDeatilsScreen extends Component {
     } catch (error) {
       console.log(error);
       if (error.type == 'error_CameraStorage_permission') {
-        Alert.alert('Error', 'Please check for permission and try again', [
+        Alert.alert('Error', I18n.t('permission_error'), [
           {
             text: 'Try again',
             onPress: () => this.askPermissionAndTakeImage(),
           },
           {
-            text: 'Cancel',
+            text: I18n.t('Close'),
             // onPress: () => {
             //   BackHandler.exitApp();
             // },
@@ -377,15 +377,15 @@ class ProductDeatilsScreen extends Component {
         error.type == 'blocked'
       ) {
         Alert.alert(
-          'Permission Denied',
-          'Please enable Storage and camera permission and try again',
+          I18n.t('Permission_Denied'),
+          I18n.t('permission_error_storage_camera'),
           [
             {
-              text: 'Change permission',
+              text: I18n.t('Change_permission'),
               onPress: () => this.openSettings(),
             },
             {
-              text: 'Cancel',
+              text: I18n.t('Close'),
               // onPress: () => {
               //   BackHandler.exitApp();
               // },
@@ -423,7 +423,7 @@ class ProductDeatilsScreen extends Component {
       // });
 
       if (data.data.status) {
-        toastAndroidiOS('Your rating is successful!!', 1500);
+        toastAndroidiOS(I18n.t('rating_success'), 1500);
       }
 
       console.log(data, 'rating');
@@ -538,13 +538,13 @@ class ProductDeatilsScreen extends Component {
                     marginTop: 15,
                     paddingLeft: 5,
                   }}>
-                  No image found
+                  {I18n.t('No_image')}
                 </Text>
               ) : null}
             </View>
           )}
           <Spinner
-            textContent="Loading.."
+            textContent={I18n.t('Loading')}
             visible={this.state.loading}
             overlayColor="rgba(0,0,0,0.5)"
             textStyle={{color: 'white'}}
@@ -630,7 +630,7 @@ class ProductDeatilsScreen extends Component {
                 borderRadius: 10,
               }}>
               <Text style={{color: Colors.dark_grey_2, textAlign: 'center'}}>
-                You're not within 100 meter radius from the product
+                {I18n.t('not_within_radius')}
               </Text>
             </View>
           ) : null}
@@ -654,8 +654,8 @@ class ProductDeatilsScreen extends Component {
                   }}>
                   {this.state.productData.property_type.toLowerCase() ==
                   'private'
-                    ? 'Private Property'
-                    : 'Public Property'}
+                    ? I18n.t('Private_Property')
+                    : I18n.t('Public_Property')}
                 </Text>
               ) : null}
               {this.state.productData ? (
@@ -761,7 +761,7 @@ class ProductDeatilsScreen extends Component {
               }}>
               <Button
                 buttonStyle={styles.btnStyle}
-                title="Navigate"
+                title={I18n.t('Navigate')}
                 onPress={() => {
                   this.handleGetDirections();
                 }}
@@ -771,7 +771,7 @@ class ProductDeatilsScreen extends Component {
               this.state.productData.property_type == 'private' ? (
                 <Button
                   buttonStyle={styles.btnStyle}
-                  title="Request Owner"
+                  title={I18n.t('Request_Owner')}
                   onPress={() => {
                     this.setState({
                       showDatePicker: true,

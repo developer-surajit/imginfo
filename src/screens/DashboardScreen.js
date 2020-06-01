@@ -154,37 +154,33 @@ class DashboardScreen extends Component {
     } catch (error) {
       console.log(error, 'askPermissionAndGetLocation');
       if (error.type == 'error_GPS_disabled') {
-        Alert.alert(
-          'GPS Disabled',
-          'Please enable GPS to search for nearby stores',
-          [
-            {
-              text: 'Try again',
-              onPress: () => this.askPermissionAndGetLocation(),
+        Alert.alert(I18n.t('GPS_Disabled'), I18n.t('enable_GPS'), [
+          {
+            text: I18n.t('Try_again'),
+            onPress: () => this.askPermissionAndGetLocation(),
+          },
+          {
+            text: I18n.t('Exit'),
+            onPress: () => {
+              BackHandler.exitApp();
             },
-            {
-              text: 'Close App',
-              onPress: () => {
-                BackHandler.exitApp();
-              },
-              style: 'cancel',
-            },
-          ],
-        );
+            style: 'cancel',
+          },
+        ]);
       } else if (
         error.type == 'error_GPS_permission' ||
         error.type == 'blocked'
       ) {
         Alert.alert(
-          'Location Permission Denied',
-          "Please allow app's location permission to search nearby stores",
+          I18n.t('Location_Permission_Denied'),
+          I18n.t('allow_location'),
           [
             {
-              text: 'Change permission',
+              text: I18n.t('Change_permission'),
               onPress: () => this.openSettings(),
             },
             {
-              text: 'Close App',
+              text: I18n.t('Exit'),
               onPress: () => {
                 BackHandler.exitApp();
               },
@@ -342,7 +338,7 @@ class DashboardScreen extends Component {
                       paddingVertical: 15,
                       paddingHorizontal: 15,
                     }}>
-                    Description :{' '}
+                    {I18n.t('Description')} :
                     <Text
                       style={{fontSize: 16, fontFamily: 'sans-serif-regular'}}>
                       {item.desc}
@@ -374,7 +370,7 @@ class DashboardScreen extends Component {
                     marginTop: 15,
                     paddingLeft: 5,
                   }}>
-                  No image found
+                  {I18n.t('No_image')}
                 </Text>
               </View>
             }
@@ -394,7 +390,7 @@ class DashboardScreen extends Component {
                   backgroundColor: Colors.main_color,
                 }}
                 containerStyle={{marginHorizontal: 20}}
-                title="Upload"
+                title={I18n.t('Upload')}
                 onPress={() => {
                   this.props.navigation.navigate('HomeScreen');
                 }}

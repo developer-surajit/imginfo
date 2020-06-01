@@ -45,6 +45,10 @@ class HomeScreen extends Component {
     modalVisible: !true,
   };
 
+  static navigationOptions = () => ({
+    headerTitle: I18n.t('Add_Item'),
+  });
+
   askPermissionAndTakeImage = async () => {
     try {
       let checkCameraPermission = await requestCameraPermission();
@@ -54,9 +58,9 @@ class HomeScreen extends Component {
     } catch (error) {
       console.log(error);
       if (error.type == 'error_CameraStorage_permission') {
-        Alert.alert('Error', 'Please check for permission and try again', [
+        Alert.alert('Error', I18n.t('permission_error'), [
           {
-            text: 'Try again',
+            text: I18n.t('Try_again'),
             onPress: () => this.askPermissionAndTakeImage(),
           },
           {
@@ -73,11 +77,11 @@ class HomeScreen extends Component {
         error.type == 'blocked'
       ) {
         Alert.alert(
-          'Permission Denied',
-          'Please enable Storage and camera permission and try again',
+          I18n.t('Permission_Denied'),
+          I18n.t('permission_error_storage_camera'),
           [
             {
-              text: 'Change permission',
+              text: I18n.t('Change_permission'),
               onPress: () => this.openSettings(),
             },
             {
@@ -264,7 +268,7 @@ class HomeScreen extends Component {
               backgroundColor: Colors.main_color,
             }}
             containerStyle={{marginHorizontal: 20, marginTop: 15}}
-            title="Take picture"
+            title={I18n.t('Take_picture')}
             onPress={() => this.askPermissionAndTakeImage()}
             // onPress={() => this.setState({modalVisible: true})}
             titleStyle={{color: 'white'}}
@@ -282,7 +286,7 @@ class HomeScreen extends Component {
             region={this.props.userLocation}>
             <Marker
               coordinate={this.props.userLocation}
-              title="Tree location"
+              title={I18n.t('current_location')}
             />
           </MapView>
 
@@ -299,7 +303,7 @@ class HomeScreen extends Component {
                   backgroundColor: Colors.main_color,
                 }}
                 containerStyle={{marginHorizontal: 20}}
-                title="Continue"
+                title={I18n.t('Continue')}
                 onPress={() => {
                   this.props.navigation.navigate('DetailsSubmitScreen', {
                     userLocation: this.props.userLocation,

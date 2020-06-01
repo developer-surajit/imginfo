@@ -43,7 +43,7 @@ class OutgoingRequestsTabScreen extends Component {
                     fontSize: 16,
                     fontFamily: 'sans-serif-medium',
                   }}>
-                  Visit Time :{' '}
+                  {I18n.t('Visit_Time')} :{' '}
                   <Text
                     style={{
                       fontSize: 16,
@@ -60,7 +60,7 @@ class OutgoingRequestsTabScreen extends Component {
                     fontFamily: 'sans-serif-medium',
                     marginTop: 5,
                   }}>
-                  Status :{' '}
+                  {I18n.t('Status')} :{' '}
                   <Text
                     style={{
                       fontSize: 16,
@@ -73,10 +73,10 @@ class OutgoingRequestsTabScreen extends Component {
                           : '#fa383e',
                     }}>
                     {item.status.toLowerCase() == 'unditermind'
-                      ? 'Not responded'
+                      ? I18n.t('Not_responded')
                       : item.status.toLowerCase() == 'allow'
-                      ? 'Request Accepted'
-                      : 'Request Rejected'}
+                      ? I18n.t('Request_Accepted')
+                      : I18n.t('Request_Rejected')}
                   </Text>
                 </Text>
               </View>
@@ -96,7 +96,7 @@ class OutgoingRequestsTabScreen extends Component {
                   paddingLeft: 5,
                   textAlign: 'center',
                 }}>
-                {this.props.spinner ? '' : 'No request found'}
+                {this.props.spinner ? '' : I18n.t('no_request')}
               </Text>
             </View>
           }

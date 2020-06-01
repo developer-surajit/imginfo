@@ -19,6 +19,10 @@ class SettingsScreen extends Component {
     };
     console.log('i18', I18n);
   }
+  static navigationOptions = () => ({
+    headerTitle: I18n.t('Setting'),
+  });
+
   logoutUser = async () => {
     try {
       await AsyncStorage.removeItem('user_id');

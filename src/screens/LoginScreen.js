@@ -75,7 +75,7 @@ class LoginScreen extends Component {
       this.setState({
         loading: false,
       });
-      toastAndroidiOS(I18n.t('invalid_login'), 2000);
+      toastAndroidiOS(I18n.t('something_wrong'), 2000);
       console.log(error.response);
     }
   };

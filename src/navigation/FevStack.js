@@ -7,7 +7,7 @@ const FevStack = createStackNavigator(
       screen: FevouriteListScreen,
       navigationOptions: {
         // header: null,
-        title: 'Favourites',
+        // title: 'Favourites',
       },
     },
   },

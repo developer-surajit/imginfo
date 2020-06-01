@@ -69,12 +69,12 @@ class IncomingRequestsTabScreen extends Component {
                     marginTop: 20,
                   }}>
                   <Button
-                    title="Allow"
+                    title={I18n.t('Allow')}
                     type="clear"
                     onPress={() => this.changeStatus(item.request_id, 1)}
                   />
                   <Button
-                    title="Deny"
+                    title={I18n.t('Deny')}
                     type="clear"
                     onPress={() => this.changeStatus(item.request_id, 2)}
                   />
@@ -88,7 +88,7 @@ class IncomingRequestsTabScreen extends Component {
                     fontFamily: 'sans-serif-medium',
                     marginTop: 10,
                   }}>
-                  Status :{' '}
+                  {I18n.t('Status')} :{' '}
                   <Text
                     style={{
                       fontSize: 16,
@@ -101,10 +101,10 @@ class IncomingRequestsTabScreen extends Component {
                           : '#fa383e',
                     }}>
                     {item.status.toLowerCase() == 'unditermind'
-                      ? 'Not reponded'
+                      ? I18n.t('Not_responded')
                       : item.status.toLowerCase() == 'allow'
-                      ? 'Request Accepted'
-                      : 'Request Rejected'}
+                      ? I18n.t('Request_Accepted')
+                      : I18n.t('Request_Rejected')}
                   </Text>
                 </Text>
               )}
@@ -124,7 +124,7 @@ class IncomingRequestsTabScreen extends Component {
                   paddingLeft: 5,
                   textAlign: 'center',
                 }}>
-                {this.props.spinner ? '' : 'No request found'}
+                {this.props.spinner ? '' : I18n.t('no_request')}
               </Text>
             </View>
           }

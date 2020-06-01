@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Text, BackHandler, StyleSheet, Image} from 'react-native';
+import {View, Text, BackHandler, StyleSheet, Image, Button} from 'react-native';
 import {
   setLocationAction,
   getProductListForMapAction,
@@ -21,6 +21,7 @@ import MapView from 'react-native-map-clustering';
 import I18n from '../utils/I18n';
 // import CustomCallout from '../shared/components/CustomCallout';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 const initialRegion = {
   latitude: -37.78825,
   longitude: -122.4324,
@@ -95,37 +96,33 @@ class MapTabScreen extends Component {
     } catch (error) {
       console.log(error, 'askPermissionAndGetLocation');
       if (error.type == 'error_GPS_disabled') {
-        Alert.alert(
-          'GPS Disabled',
-          'Please enable GPS to search for nearby stores',
-          [
-            {
-              text: 'Try again',
-              onPress: () => this.askPermissionAndGetLocation(),
+        Alert.alert(I18n.t('GPS_Disabled'), I18n.t('enable_GPS'), [
+          {
+            text: I18n.t('Try_again'),
+            onPress: () => this.askPermissionAndGetLocation(),
+          },
+          {
+            text: I18n.t('Close'),
+            onPress: () => {
+              BackHandler.exitApp();
             },
-            {
-              text: 'Close App',
-              onPress: () => {
-                BackHandler.exitApp();
-              },
-              style: 'cancel',
-            },
-          ],
-        );
+            style: 'cancel',
+          },
+        ]);
       } else if (
         error.type == 'error_GPS_permission' ||
         error.type == 'blocked'
       ) {
         Alert.alert(
-          'Location Permission Denied',
-          "Please allow app's location permission to search nearby stores",
+          I18n.t('Location_Permission_Denied'),
+          I18n.t('allow_location'),
           [
             {
-              text: 'Change permission',
+              text: I18n.t('Change_permission'),
               onPress: () => this.openSettings(),
             },
             {
-              text: 'Close App',
+              text: I18n.t('Exit'),
               onPress: () => {
                 BackHandler.exitApp();
               },
@@ -175,7 +172,7 @@ class MapTabScreen extends Component {
     return (
       <View style={{flex: 1}}>
         <Spinner
-          textContent="Loading.."
+          textContent={I18n.t('Loading')}
           visible={this.props.spinner}
           overlayColor="rgba(0,0,0,0.5)"
           textStyle={{color: 'white'}}

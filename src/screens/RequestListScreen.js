@@ -18,8 +18,8 @@ class RequestListScreen extends Component {
       data: null,
       index: 0,
       routes: [
-        {key: 'first', title: 'Own Requests'},
-        {key: 'second', title: 'Sent Requests'},
+        {key: 'first', title: I18n.t('Own_Requests')},
+        {key: 'second', title: I18n.t('Sent_Requests')},
       ],
     };
   }
